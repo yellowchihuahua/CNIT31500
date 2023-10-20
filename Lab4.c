@@ -11,6 +11,8 @@ struct Node {
 	struct Node* next;
 };
 
+struct Node* _head = NULL;
+
 struct Node* CreateNode(char *firstName, char *lastName, char *major, float GPA){
 	struct Node *newNode = (struct Node*)malloc(sizeof(struct Node));
 	if (newNode == NULL) {
@@ -22,94 +24,92 @@ struct Node* CreateNode(char *firstName, char *lastName, char *major, float GPA)
 	strcpy(newNode->lastName, lastName);
 	strcpy(newNode->major, major);
 	newNode->GPA = GPA;
+	newNode->next = NULL;
 
 	return newNode;
 }
 
 
 //ref https://stackoverflow.com/questions/6417158/c-how-to-free-nodes-in-the-linked-list
-void FreeList(struct Node* _startPointer){
+void FreeList(){
 //traverse through and free allocated memory
-	struct Node* head = _startPointer;
-	struct Node* tmp;
+	struct Node* head = _head;
+	struct Node* temp;
     while (head != NULL) {
-        tmp = head;
+        temp = head;
 		head = head->next;
-		free(tmp);
+		free(temp);
     }
 }
 
-void PrintNode(struct Node* _nodePointer){
-	printf("%s, ", _nodePointer->firstName);
-	printf("%s, ", _nodePointer->lastName);
-	printf("%s, ", _nodePointer->major);
-	printf("%.2f\n", _nodePointer->GPA);
+void PrintNode(struct Node* nodePointer){
+	printf("%s, %s, %s, %.2f\n", nodePointer->firstName, nodePointer->lastName, nodePointer->major, nodePointer->GPA);
+	//printf("%s, ", nodePointer->lastName);
+	//printf("%s, ", nodePointer->major);
+	//printf("%.2f\n", nodePointer->GPA);
 }
 
-void PrintList(struct Node* _startPointer){
+void PrintList(){
 
-	if(_startPointer == NULL){
+	if(_head == NULL){
 		printf("Empty list.\n");
 		return;
 	}
 
-	struct Node* current = _startPointer;
+	struct Node* current = _head;
 	while (current != NULL) {
 		//printf("%s\n", current->firstName);
 
-		printf("%s, ", current->firstName);
-		printf("%s, ", current->lastName);
-		printf("%s, ", current->major);
-		printf("%.2f\n", current->GPA);
-		//PrintNode(current);
+		//printf("%s, ", current->firstName);
+		//printf("%s, ", current->lastName);
+		//printf("%s, ", current->major);
+		//printf("%.2f\n", current->GPA);
+		PrintNode(current);
 		current = current->next;
 	}
 }
 
 //InsertFront
 //ref ll.c example, TA in person assistance
-void InsertFront(struct Node **_startPointer, char _firstName[64], char _lastName[64], char _major[64], float _GPA){
-	struct Node* nodeToInsert = CreateNode(_firstName, _lastName, _major, _GPA);
+void InsertFront(char firstName[64], char lastName[64], char major[64], float GPA){
+	struct Node* nodeToInsert = CreateNode(firstName, lastName, major, GPA);
 
-	//check if already has items
-	if (*_startPointer == NULL){
-		*_startPointer = nodeToInsert;
-		return;
-	}
-
-	nodeToInsert->next = *_startPointer; //points next var to front of list
-	*_startPointer = nodeToInsert; //inserts node and sets pointer of new front
+	nodeToInsert->next = _head; //points next var to front of list, global variable
+	_head = nodeToInsert; //inserts node and sets pointer of new front, global varaible
 }
 
 //InsertEnd
-void InsertEnd(struct Node **_startPointer, char _firstName[64], char _lastName[64], char _major[64], float _GPA){
+void InsertEnd(char _firstName[64], char _lastName[64], char _major[64], float _GPA){
 
 	struct Node* nodeToInsert = CreateNode(_firstName, _lastName, _major, _GPA);
 
 	//check if already has items
-	if (*_startPointer == NULL){
-		*_startPointer = nodeToInsert;
+	if (_head == NULL){
+		_head = nodeToInsert;
 		return;
 	}
 
 	//get to the last node in linked list
-	struct Node* current = *_startPointer;
+	struct Node* current = _head;
 	while(current->next != NULL){
 		current = current->next;
 	}
 	current->next = nodeToInsert;
-	nodeToInsert->next = NULL;
 }
 
-struct Node* FindNodeByName(struct Node *_startPointer, char *_firstName){
-	struct Node* current = _startPointer;
-	while (current != NULL) {
-		if (current->firstName == _firstName) {
-			return current;
-		}
+struct Node* LookUpByIndex(int index){
+	struct Node* current = _head;
+	int count = 0;
+	while (current != NULL && count < index) {
 		current = current->next;
+		count++;
 	}
-	return NULL; //no node with matching data
+	
+	if (current != NULL){
+		return current; //no node with matching data
+	}
+	printf("No node with matching index.\n");
+	return NULL; //reached end of LL, no node with matching data
 }
 
 
@@ -122,9 +122,9 @@ struct Node* FindNodeByName(struct Node *_startPointer, char *_firstName){
 //• DeleteEnd - delete a node at the end of the list.
 //• Traverse - traverse the list based on some key value in the data portion of
 //the node.
-//• LookUpByIndex - find a particular node by an index number. Return -1
+//DONE • LookUpByIndex - find a particular node by an index number. Return -1 
 //if that index does not exist.
-//• PrintNode – print information in the current node: first name, last name,
+//DONE• PrintNode – print information in the current node: first name, last name,
 //major, and GPA
 
 
@@ -147,20 +147,17 @@ int main() {
 
 
 
-	//CreateListNode
-	struct Node* llHead;
-
 	// CreatListNode
-	InsertEnd(&llHead, student1FirstName, student1LastName, student1Major, student1GPA);
-	InsertEnd(&llHead, student2FirstName, student2LastName, student2Major, student2GPA);
-	InsertEnd(&llHead, student3FirstName, student3LastName, student3Major, student3GPA);
-	PrintList(llHead);
+	InsertEnd(student1FirstName, student1LastName, student1Major, student1GPA);
+	InsertEnd(student2FirstName, student2LastName, student2Major, student2GPA);
+	InsertEnd(student3FirstName, student3LastName, student3Major, student3GPA);
+	PrintList();
 
 
 	char inputChar;
 	printf("Press any key to exit: ");
 	scanf("%c", &inputChar);
 
-	FreeList(llHead);
+	FreeList();
 	return 0;
 }
