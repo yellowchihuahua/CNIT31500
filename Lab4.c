@@ -86,22 +86,18 @@ void InsertEnd(struct Node **_startPointer, char _firstName[64], char _lastName[
 
 	struct Node* nodeToInsert = CreateNode(_firstName, _lastName, _major, _GPA);
 
-	printf("node created");
 	//check if already has items
 	if (*_startPointer == NULL){
 		*_startPointer = nodeToInsert;
-		printf("no items, using this");
 		return;
 	}
 
 	//get to the last node in linked list
 	struct Node* current = *_startPointer;
-	while(current != NULL){
+	while(current->next != NULL){
 		current = current->next;
-		printf("traversing to end");
 	}
 	current->next = nodeToInsert;
-	printf("adding to end");
 	nodeToInsert->next = NULL;
 }
 
@@ -155,19 +151,15 @@ int main() {
 	struct Node* llHead;
 
 	// CreatListNode
-	printf("1");
 	InsertEnd(&llHead, student1FirstName, student1LastName, student1Major, student1GPA);
-	printf("1");
 	InsertEnd(&llHead, student2FirstName, student2LastName, student2Major, student2GPA);
-	printf("1");
 	InsertEnd(&llHead, student3FirstName, student3LastName, student3Major, student3GPA);
-	printf("1");
 	PrintList(llHead);
 
 
 	char inputChar;
 	printf("Press any key to exit: ");
-	scanf(" %c", &inputChar);
+	scanf("%c", &inputChar);
 
 	FreeList(llHead);
 	return 0;
