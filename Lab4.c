@@ -34,7 +34,7 @@ struct Node* LookUpByIndex(struct Node** start, int index){
 	int count = 0;
 
 	if(index < 0){
-		printf("LookUpByIndex(); -- Given index is less than 0\n");
+		printf("LookUpByIndex(); -- Given index is less than 0.\n");
 		return NULL;
 	}
 
@@ -290,20 +290,36 @@ void DeleteEnd(struct Node** start){
 	current->next = NULL;
 }
 
-void DeleteMiddle(int index){
-	if (_head == NULL) {
+void DeleteMiddle(struct Node** start, int index){
+	if (GetListLength(start) == 0) {
 		printf("DeleteMiddle(); -- Empty list, nothing to delete.\n");
 		return;
 	}
-	struct Node* nodeToDelete = LookUpByIndex(&_head, index);
+	struct Node* nodeToDelete = LookUpByIndex(start, index);
+	if(nodeToDelete == NULL) {
+		printf("DeleteMiddle(); -- No node exists at given index to delete.\n");
+		return;
+	}
+	struct Node* nodeBefore = LookUpByIndex(start, index-1);
+	if(nodeBefore == NULL) { //means the index given was 0, so delete front node
+		DeleteFront(start);
+		return;
+	}
+	struct Node* nodeAfter = LookUpByIndex(start, index+1);
+	if (nodeAfter == NULL) { //means that index given was last in list, so delete end
+		DeleteEnd(start);
+		return;
+	}
 
+	nodeBefore->next = nodeAfter;
+	free(nodeToDelete);
 }
 //• DONE InsertMiddle - insert a node in the middle of the list. (Hint: use the data
 //to know where to insert the node)
-//• DeleteFront - delete the first node in the list.
+//• DONE DeleteFront - delete the first node in the list.
 //• DeleteMiddle - delete a node in the middle of the list. (Hint: use the data
 //to know where to delete the node)
-//• DeleteEnd - delete a node at the end of the list.
+//• DONE DeleteEnd - delete a node at the end of the list.
 //• Traverse - traverse the list based on some key value in the data portion of
 //the node.
 //DONE • LookUpByIndex - find a particular node by an index number. Return -1 
@@ -362,11 +378,10 @@ int main() {
 	
 	PrintList(&_head);
 
-	DeleteFront(&_head);
+	DeleteMiddle(&_head, 2);
 	PrintList(&_head);
 
-	DeleteEnd(&_head);
-	PrintList(&_head);
+
 
 	
 	listLength = GetListLength(&_head);
