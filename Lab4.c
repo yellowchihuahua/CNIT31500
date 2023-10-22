@@ -123,14 +123,14 @@ void InsertEnd(struct Node** start, struct Node* nodeToInsert){
 
 //param index is the index before node to insert
 void InsertMiddle(struct Node** start, int index, struct Node* nodeToInsert){
-	struct Node* previousNode = LookUpByIndex(&_head, index);
-	struct Node* nextNode = LookUpByIndex(&_head, index+1);
+	struct Node* previousNode = LookUpByIndex(start, index);
+	struct Node* nextNode = LookUpByIndex(start, index+1);
 
 	if(nextNode != NULL) {
 		previousNode->next = nodeToInsert;
 		nodeToInsert->next = nextNode; //linking 
 	} else {
-		InsertEnd(&_head, nodeToInsert);
+		InsertEnd(start, nodeToInsert);
 	}
 }
 
