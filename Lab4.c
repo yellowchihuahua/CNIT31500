@@ -197,10 +197,9 @@ char* ToString(struct Node* node) {
 }
 
 //not transferable to general linked list functionality?
-void InsertByGPA(struct Node* nodeToInsert) {	
-	if (_head == NULL) {
-		InsertFront(&_head, nodeToInsert);
-		printf("head is null, putting it in front\n");
+void InsertByGPA(struct Node** start, struct Node* nodeToInsert) {	
+	if (GetListLength(start) == 0) {
+		InsertFront(start, nodeToInsert);
 		return;
 	} 
 	//compare with head first
@@ -213,9 +212,7 @@ void InsertByGPA(struct Node* nodeToInsert) {
 	strcat(nodeToInsertStr, nodeToInsert->firstName);
 	strcat(nodeToInsertStr, nodeToInsert->major);
 
-	printf("NODE TO INSERT COMPARING STRING: %s \n", nodeToInsertStr);
-
-	struct Node* current = _head;
+	struct Node* current = *start;
 	char currentStr[256]; 
 	char currentGpaStr[10];
 	ftoa((5.0f-current->GPA), currentGpaStr, 2); //'inverse' of gpa goes first so i can sort completely alphabetically and still get largest gpa first
@@ -226,13 +223,12 @@ void InsertByGPA(struct Node* nodeToInsert) {
 
 	int comp = strcmp(nodeToInsertStr, currentStr);
 	if(comp < 0) {//smaller alphabetically
-		InsertFront(&_head, nodeToInsert);
-		printf("smaller alphabetically than head, putting in front\n");
+		InsertFront(start, nodeToInsert);
 		return;
 	}
 
 	printf("comparing from second item\n");
-	current = _head->next; //start iterating from second item to utilize InsertMiddle()
+	current = current->next; //start iterating from second item to utilize InsertMiddle()
 	int count = 0; //counter, index to use InsertMiddle() on
 	while (current != NULL) {
 		currentStr[0] = '\0'; //clear strings
@@ -247,7 +243,7 @@ void InsertByGPA(struct Node* nodeToInsert) {
 		
 		if(comp < 0) { //alphabetically smaller, inserting before current node
 			printf("smaller alphabetically than current, inserting before %s\n", ToString(current));
-			InsertMiddle(&_head, count, nodeToInsert);
+			InsertMiddle(start, count, nodeToInsert);
 			return;
 		}
 		current = current->next;
@@ -255,7 +251,7 @@ void InsertByGPA(struct Node* nodeToInsert) {
 	}
 	//reached the end of list and it's not bigger than anything, so inserting at end
 	printf("reached end of list, inserting at end\n");
-	InsertEnd(&_head, nodeToInsert);
+	InsertEnd(start, nodeToInsert);
 }
 
 void DeleteFront() {
@@ -347,12 +343,12 @@ int main() {
 	int listLength = GetListLength(&_head);
 	printf("Count: %d\n", listLength);
 
-	InsertByGPA(student1);
-	InsertByGPA(student2);
-	InsertByGPA(student3);
-	InsertByGPA(student4);
-	InsertByGPA(student5);
-	InsertByGPA(student6);
+	InsertByGPA(&_head, student1);
+	InsertByGPA(&_head, student2);
+	InsertByGPA(&_head, student3);
+	InsertByGPA(&_head, student4);
+	InsertByGPA(&_head, student5);
+	InsertByGPA(&_head, student6);
 	
 	PrintList();
 
