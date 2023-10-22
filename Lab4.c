@@ -122,7 +122,7 @@ void InsertEnd(struct Node** start, struct Node* nodeToInsert){
 }
 
 //param index is the index before node to insert
-void InsertMiddle(int index, struct Node* nodeToInsert){
+void InsertMiddle(struct Node** start, int index, struct Node* nodeToInsert){
 	struct Node* previousNode = LookUpByIndex(&_head, index);
 	struct Node* nextNode = LookUpByIndex(&_head, index+1);
 
@@ -247,7 +247,7 @@ void InsertByGPA(struct Node* nodeToInsert) {
 		
 		if(comp < 0) { //alphabetically smaller, inserting before current node
 			printf("smaller alphabetically than current, inserting before %s\n", ToString(current));
-			InsertMiddle(count, nodeToInsert);
+			InsertMiddle(&_head, count, nodeToInsert);
 			return;
 		}
 		current = current->next;
