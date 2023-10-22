@@ -29,8 +29,8 @@ struct Node* CreateNode(char *firstName, char *lastName, char *major, float GPA)
 	return newNode;
 }
 
-struct Node* LookUpByIndex(int index){
-	struct Node* current = _head;
+struct Node* LookUpByIndex(struct Node** start, int index){
+	struct Node* current = *start;
 	int count = 0;
 
 	if(index < 0){
@@ -123,8 +123,8 @@ void InsertEnd(struct Node** start, struct Node* nodeToInsert){
 
 //param index is the index before node to insert
 void InsertMiddle(int index, struct Node* nodeToInsert){
-	struct Node* previousNode = LookUpByIndex(index);
-	struct Node* nextNode = LookUpByIndex(index+1);
+	struct Node* previousNode = LookUpByIndex(&_head, index);
+	struct Node* nextNode = LookUpByIndex(&_head, index+1);
 
 	if(nextNode != NULL) {
 		previousNode->next = nodeToInsert;
@@ -289,7 +289,7 @@ void DeleteMiddle(int index){
 		printf("DeleteMiddle(); -- Empty list, nothing to delete.\n");
 		return;
 	}
-	struct Node* nodeToDelete = LookUpByIndex(index);
+	struct Node* nodeToDelete = LookUpByIndex(&_head, index);
 
 }
 //• DONE InsertMiddle - insert a node in the middle of the list. (Hint: use the data
