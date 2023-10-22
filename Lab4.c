@@ -206,7 +206,7 @@ void InsertByGPA(struct Node* nodeToInsert) {
 
 	char nodeToInsertStr[256]; //convert it to a string to compare entir ething alphabetically
 	char toInsertGpaStr[10];
-	ftoa((9.0-nodeToInsert->GPA), toInsertGpaStr, 2); //'inverse' of gpa goes first so i can sort completely alphabetically and still get largest gpa first
+	ftoa((5.0f-nodeToInsert->GPA), toInsertGpaStr, 2); //'inverse' of gpa goes first so i can sort completely alphabetically and still get largest gpa first
 	strcpy(nodeToInsertStr, toInsertGpaStr); 
 	strcat(nodeToInsertStr, nodeToInsert->lastName);
 	strcat(nodeToInsertStr, nodeToInsert->firstName);
@@ -217,7 +217,7 @@ void InsertByGPA(struct Node* nodeToInsert) {
 	struct Node* current = _head;
 	char currentStr[256]; 
 	char currentGpaStr[10];
-	ftoa((9.0-current->GPA), currentGpaStr, 2); //'inverse' of gpa goes first so i can sort completely alphabetically and still get largest gpa first
+	ftoa((5.0f-current->GPA), currentGpaStr, 2); //'inverse' of gpa goes first so i can sort completely alphabetically and still get largest gpa first
 	strcpy(currentStr, currentGpaStr); 
 	strcat(currentStr, current->lastName); //insert the rest of them to compare alphabetically in order
 	strcat(currentStr, current->firstName);
@@ -236,7 +236,7 @@ void InsertByGPA(struct Node* nodeToInsert) {
 	while (current->next != NULL) {
 		currentStr[0] = '\0'; //clear strings
 		currentGpaStr[0] = '\0';
-		ftoa((9.0-current->GPA), currentGpaStr, 2); //'inverse' of gpa goes first so i can sort completely alphabetically and still get largest gpa first
+		ftoa((5.0f-current->GPA), currentGpaStr, 2); //'inverse' of gpa goes first so i can sort completely alphabetically and still get largest gpa first
 		strcpy(currentStr, currentGpaStr); 
 		strcat(currentStr, current->lastName); //insert the rest of them to compare alphabetically in order
 		strcat(currentStr, current->firstName);
