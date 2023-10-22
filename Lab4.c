@@ -343,6 +343,8 @@ int main() {
 	float student6GPA = 2.0;
 	struct Node* student6 = CreateNode(student6FirstName, student6LastName, student6Major, student6GPA);
 
+	int listLength = GetListLength(&_head);
+	printf("Count: %d\n", listLength);
 
 	InsertByGPA(student1);
 	InsertByGPA(student2);
@@ -354,7 +356,7 @@ int main() {
 	PrintList();
 
 	
-	int listLength = GetListLength(&_head);
+	listLength = GetListLength(&_head);
 	printf("Count: %d\n", listLength);
 
 
