@@ -228,7 +228,7 @@ void InsertByGPA(struct Node** start, struct Node* nodeToInsert) {
 	}
 
 	printf("comparing from second item\n");
-	current = current->next; //start iterating from second item to utilize InsertMiddle()
+	current = (*start)->next; //start iterating from second item to utilize InsertMiddle()
 	int count = 0; //counter, index to use InsertMiddle() on
 	while (current != NULL) {
 		currentStr[0] = '\0'; //clear strings
@@ -254,26 +254,25 @@ void InsertByGPA(struct Node** start, struct Node* nodeToInsert) {
 	InsertEnd(start, nodeToInsert);
 }
 
-void DeleteFront() {
-	if (_head == NULL) {
-		printf("DeleteFront(); -- Empty list, nothing to delete\n");
-		return;
-	}
-	struct Node* temp = _head; //temp pointer to hold current head
-	_head = _head->next; //make head point to 2nd item in list
-	free(temp); //free temp pointer
-
-
-//void DeleteFront(struct Node** start) {
-//	struct Node* head = *start;
-//	if (head == NULL) {
+//void DeleteFront() {
+//	if (_head == NULL) {
 //		printf("DeleteFront(); -- Empty list, nothing to delete\n");
 //		return;
 //	}
-//	struct Node* temp = head; //temp pointer to hold current head
-//	head = head->next; //make head point to 2nd item in list
+//	struct Node* temp = _head; //temp pointer to hold current head
+//	_head = _head->next; //make head point to 2nd item in list
 //	free(temp); //free temp pointer
-//}
+
+
+void DeleteFront(struct Node** start) {
+	if (GetListLength(start) == 0) {
+		printf("DeleteFront(); -- Empty list, nothing to delete\n");
+		return;
+	}
+	struct Node* temp = *start; //temp pointer to hold current head
+	*start = (*start)->next; //make head point to 2nd item in list
+	free(temp); //free temp pointer
+}
 
 void DeleteEnd(){
 	if (_head == NULL) {
