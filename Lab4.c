@@ -29,15 +29,50 @@ struct Node* CreateNode(char *firstName, char *lastName, char *major, float GPA)
 	return newNode;
 }
 
+struct Node* LookUpByIndex(int index){
+	struct Node* current = _head;
+	int count = 0;
+
+	if(index < 0){
+		printf("LookUpByIndex(); -- Given index is less than 0\n");
+		return NULL;
+	}
+
+	while (current != NULL && count < index) {
+		current = current->next;
+		count++;
+	}
+	if (current != NULL){
+		return current; 
+	}
+	printf("LookUpByIndex(); -- No node with matching index exists in list.\n");
+	return NULL; //reached end of LL, no node with matching data
+}
+
+//generalized function
+int GetListLength(struct Node** start){
+	int count = 0;
+	struct Node* head = *start;
+	if (head == NULL){
+		return count;
+	}
+	count++;
+	struct Node* current = head;
+	while(current->next != NULL){
+		current = current->next;
+		count++;
+	}
+
+	return count;
+}
 
 //ref https://stackoverflow.com/questions/6417158/c-how-to-free-nodes-in-the-linked-list
 void FreeList(){
 //traverse through and free allocated memory
-	struct Node* head = _head;
 	struct Node* temp;
-    while (head != NULL) {
-        temp = head;
-		head = head->next;
+    while (_head != NULL) {
+        temp = _head;
+		_head = _head->next;
 		free(temp);
     }
 }
@@ -48,7 +83,7 @@ void PrintNode(struct Node* nodePointer){
 
 void PrintList(){
 	if(_head == NULL){
-		printf("Empty list.\n");
+		printf("PrintList(); -- Empty list, nothing to print.\n");
 		return;
 	}
 	struct Node* current = _head;
@@ -85,28 +120,7 @@ void InsertEnd(struct Node* nodeToInsert){
 	current->next = nodeToInsert;
 }
 
-//general usage, param index is the index to look up
-struct Node* LookUpByIndex(int index){
-	struct Node* current = _head;
-	int count = 0;
-
-	if(index < 0){
-		return NULL;
-	}
-
-	while (current != NULL && count < index) {
-		current = current->next;
-		count++;
-	}
-	
-	if (current != NULL){
-		return current; //no node with matching data
-	}
-	printf("No node with matching index.\n");
-	return NULL; //reached end of LL, no node with matching data
-}
-
-//general usage insert middle function, param index is the index before node to insert
+//param index is the index before node to insert
 void InsertMiddle(int index, struct Node* nodeToInsert){
 	struct Node* previousNode = LookUpByIndex(index);
 	struct Node* nextNode = LookUpByIndex(index+1);
@@ -243,6 +257,40 @@ void InsertByGPA(struct Node* nodeToInsert) {
 	InsertEnd(nodeToInsert);
 }
 
+void DeleteFront() {
+	if (_head == NULL) {
+		printf("DeleteFront(); -- Empty list, nothing to delete\n");
+		return;
+	}
+	struct Node* temp = _head; //temp pointer to hold current head
+	_head = _head->next; //make head point to 2nd item in list
+	free(temp); //free temp pointer
+}
+
+void DeleteEnd(){
+	if (_head == NULL) {
+		printf("DeleteEnd(); -- Empty list, nothing to delete\n");
+		return;
+	}
+	if (_head->next == NULL) {
+		FreeList(_head);
+	}
+	struct Node* current = _head;
+	while (current->next->next != NULL) {
+		current = current->next;
+	}
+	free(current->next);
+	current->next = NULL;
+}
+
+void DeleteMiddle(int index){
+	if (_head == NULL) {
+		printf("DeleteMiddle(); -- Empty list, nothing to delete.\n");
+		return;
+	}
+	struct Node* nodeToDelete = LookUpByIndex(index);
+
+}
 //• DONE InsertMiddle - insert a node in the middle of the list. (Hint: use the data
 //to know where to insert the node)
 //• DeleteFront - delete the first node in the list.
@@ -295,23 +343,19 @@ int main() {
 	float student6GPA = 2.0;
 	struct Node* student6 = CreateNode(student6FirstName, student6LastName, student6Major, student6GPA);
 
-	printf("nodes created\n");
 
-
-	printf("inserting student 1: %s\n", ToString(student1));
 	InsertByGPA(student1);
-	printf("inserting student 2: %s\n", ToString(student2));
 	InsertByGPA(student2);
-	printf("inserting student 3: %s\n", ToString(student3));
 	InsertByGPA(student3);
-	printf("inserting student 4: %s\n", ToString(student4));
 	InsertByGPA(student4);
-	printf("inserting student 5: %s\n", ToString(student5));
 	InsertByGPA(student5);
-	printf("inserting student 6: %s\n", ToString(student6));
 	InsertByGPA(student6);
 	
 	PrintList();
+
+	
+	int listLength = GetListLength(&_head);
+	printf("Count: %d\n", listLength);
 
 
 	char inputChar;
