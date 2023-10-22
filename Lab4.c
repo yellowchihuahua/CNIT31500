@@ -95,13 +95,14 @@ void PrintList(){
 
 //InsertFront
 //ref ll.c example, TA in person assistance
-void InsertFront(struct Node* nodeToInsert){
-	if (_head == NULL){
-		_head = nodeToInsert;
+void InsertFront(struct Node** start, struct Node* nodeToInsert){
+	if (GetListLength(start) == 0){
+		*start = nodeToInsert;
 		return;
 	}
-	nodeToInsert->next = _head; //points next var to front of list, global variable
-	_head = nodeToInsert; //inserts node and sets pointer of new front, global varaible
+	
+	nodeToInsert->next = *start; //points next var to front of list, global variable
+	*start = nodeToInsert; //inserts node and sets pointer of new front, global varaible
 }
 
 //InsertEnd generalized
@@ -198,7 +199,7 @@ char* ToString(struct Node* node) {
 //not transferable to general linked list functionality?
 void InsertByGPA(struct Node* nodeToInsert) {	
 	if (_head == NULL) {
-		InsertFront(nodeToInsert);
+		InsertFront(&_head, nodeToInsert);
 		printf("head is null, putting it in front\n");
 		return;
 	} 
@@ -225,7 +226,7 @@ void InsertByGPA(struct Node* nodeToInsert) {
 
 	int comp = strcmp(nodeToInsertStr, currentStr);
 	if(comp < 0) {//smaller alphabetically
-		InsertFront(nodeToInsert);
+		InsertFront(&_head, nodeToInsert);
 		printf("smaller alphabetically than head, putting in front\n");
 		return;
 	}
