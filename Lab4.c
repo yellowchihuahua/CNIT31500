@@ -29,12 +29,12 @@ struct Node* CreateNode(char *firstName, char *lastName, char *major, float GPA)
 	return newNode;
 }
 
-struct Node* LookUpByIndex(int index){
-	struct Node* current = _head;
+struct Node* LookUpByIndex(struct Node** start, int index){
+	struct Node* current = *start;
 	int count = 0;
 
 	if(index < 0){
-		printf("LookUpByIndex(); -- Given index is less than 0\n");
+		printf("LookUpByIndex(); -- Given index is less than 0.\n");
 		return NULL;
 	}
 
@@ -81,12 +81,12 @@ void PrintNode(struct Node* nodePointer){
 	printf("%s, %s, %s, %.2f\n", nodePointer->firstName, nodePointer->lastName, nodePointer->major, nodePointer->GPA);
 }
 
-void PrintList(){
-	if(_head == NULL){
+void PrintList(struct Node** start){
+	if(GetListLength(start) == 0){
 		printf("PrintList(); -- Empty list, nothing to print.\n");
 		return;
 	}
-	struct Node* current = _head;
+	struct Node* current = *start;
 	while (current != NULL) {
 		PrintNode(current);
 		current = current->next;
@@ -95,25 +95,26 @@ void PrintList(){
 
 //InsertFront
 //ref ll.c example, TA in person assistance
-void InsertFront(struct Node* nodeToInsert){
-	if (_head == NULL){
-		_head = nodeToInsert;
+void InsertFront(struct Node** start, struct Node* nodeToInsert){
+	if (GetListLength(start) == 0){
+		*start = nodeToInsert;
 		return;
 	}
-	nodeToInsert->next = _head; //points next var to front of list, global variable
-	_head = nodeToInsert; //inserts node and sets pointer of new front, global varaible
+	
+	nodeToInsert->next = *start; //points next var to front of list, global variable
+	*start = nodeToInsert; //inserts node and sets pointer of new front, global varaible
 }
 
 //InsertEnd generalized
-void InsertEnd(struct Node* nodeToInsert){
+void InsertEnd(struct Node** start, struct Node* nodeToInsert){
 	//check if already has items
-	if (_head == NULL){
-		_head = nodeToInsert;
+	if (GetListLength(start) == 0){
+		*start = nodeToInsert;
 		return;
 	}
 
 	//get to the last node in linked list
-	struct Node* current = _head;
+	struct Node* current = *start;
 	while(current->next != NULL){
 		current = current->next;
 	}
@@ -121,15 +122,15 @@ void InsertEnd(struct Node* nodeToInsert){
 }
 
 //param index is the index before node to insert
-void InsertMiddle(int index, struct Node* nodeToInsert){
-	struct Node* previousNode = LookUpByIndex(index);
-	struct Node* nextNode = LookUpByIndex(index+1);
+void InsertMiddle(struct Node** start, int index, struct Node* nodeToInsert){
+	struct Node* previousNode = LookUpByIndex(start, index);
+	struct Node* nextNode = LookUpByIndex(start, index+1);
 
 	if(nextNode != NULL) {
 		previousNode->next = nodeToInsert;
 		nodeToInsert->next = nextNode; //linking 
 	} else {
-		InsertEnd(nodeToInsert);
+		InsertEnd(start, nodeToInsert);
 	}
 }
 
@@ -196,10 +197,9 @@ char* ToString(struct Node* node) {
 }
 
 //not transferable to general linked list functionality?
-void InsertByGPA(struct Node* nodeToInsert) {	
-	if (_head == NULL) {
-		InsertFront(nodeToInsert);
-		printf("head is null, putting it in front\n");
+void InsertByGPA(struct Node** start, struct Node* nodeToInsert) {	
+	if (GetListLength(start) == 0) {
+		InsertFront(start, nodeToInsert);
 		return;
 	} 
 	//compare with head first
@@ -212,9 +212,7 @@ void InsertByGPA(struct Node* nodeToInsert) {
 	strcat(nodeToInsertStr, nodeToInsert->firstName);
 	strcat(nodeToInsertStr, nodeToInsert->major);
 
-	printf("NODE TO INSERT COMPARING STRING: %s \n", nodeToInsertStr);
-
-	struct Node* current = _head;
+	struct Node* current = *start;
 	char currentStr[256]; 
 	char currentGpaStr[10];
 	ftoa((5.0f-current->GPA), currentGpaStr, 2); //'inverse' of gpa goes first so i can sort completely alphabetically and still get largest gpa first
@@ -225,13 +223,12 @@ void InsertByGPA(struct Node* nodeToInsert) {
 
 	int comp = strcmp(nodeToInsertStr, currentStr);
 	if(comp < 0) {//smaller alphabetically
-		InsertFront(nodeToInsert);
-		printf("smaller alphabetically than head, putting in front\n");
+		InsertFront(start, nodeToInsert);
 		return;
 	}
 
 	printf("comparing from second item\n");
-	current = _head->next; //start iterating from second item to utilize InsertMiddle()
+	current = (*start)->next; //start iterating from second item to utilize InsertMiddle()
 	int count = 0; //counter, index to use InsertMiddle() on
 	while (current != NULL) {
 		currentStr[0] = '\0'; //clear strings
@@ -246,7 +243,7 @@ void InsertByGPA(struct Node* nodeToInsert) {
 		
 		if(comp < 0) { //alphabetically smaller, inserting before current node
 			printf("smaller alphabetically than current, inserting before %s\n", ToString(current));
-			InsertMiddle(count, nodeToInsert);
+			InsertMiddle(start, count, nodeToInsert);
 			return;
 		}
 		current = current->next;
@@ -254,28 +251,38 @@ void InsertByGPA(struct Node* nodeToInsert) {
 	}
 	//reached the end of list and it's not bigger than anything, so inserting at end
 	printf("reached end of list, inserting at end\n");
-	InsertEnd(nodeToInsert);
+	InsertEnd(start, nodeToInsert);
 }
 
-void DeleteFront() {
-	if (_head == NULL) {
+//void DeleteFront() {
+//	if (_head == NULL) {
+//		printf("DeleteFront(); -- Empty list, nothing to delete\n");
+//		return;
+//	}
+//	struct Node* temp = _head; //temp pointer to hold current head
+//	_head = _head->next; //make head point to 2nd item in list
+//	free(temp); //free temp pointer
+
+
+void DeleteFront(struct Node** start) {
+	if (GetListLength(start) == 0) {
 		printf("DeleteFront(); -- Empty list, nothing to delete\n");
 		return;
 	}
-	struct Node* temp = _head; //temp pointer to hold current head
-	_head = _head->next; //make head point to 2nd item in list
+	struct Node* temp = *start; //temp pointer to hold current head
+	*start = (*start)->next; //make head point to 2nd item in list
 	free(temp); //free temp pointer
 }
 
-void DeleteEnd(){
-	if (_head == NULL) {
+void DeleteEnd(struct Node** start){
+	if (GetListLength(start) == 0) {
 		printf("DeleteEnd(); -- Empty list, nothing to delete\n");
 		return;
 	}
-	if (_head->next == NULL) {
-		FreeList(_head);
+	if ((*start)->next == NULL) {
+		FreeList(*start);
 	}
-	struct Node* current = _head;
+	struct Node* current = *start;
 	while (current->next->next != NULL) {
 		current = current->next;
 	}
@@ -283,20 +290,36 @@ void DeleteEnd(){
 	current->next = NULL;
 }
 
-void DeleteMiddle(int index){
-	if (_head == NULL) {
+void DeleteMiddle(struct Node** start, int index){
+	if (GetListLength(start) == 0) {
 		printf("DeleteMiddle(); -- Empty list, nothing to delete.\n");
 		return;
 	}
-	struct Node* nodeToDelete = LookUpByIndex(index);
+	struct Node* nodeToDelete = LookUpByIndex(start, index);
+	if(nodeToDelete == NULL) {
+		printf("DeleteMiddle(); -- No node exists at given index to delete.\n");
+		return;
+	}
+	struct Node* nodeBefore = LookUpByIndex(start, index-1);
+	if(nodeBefore == NULL) { //means the index given was 0, so delete front node
+		DeleteFront(start);
+		return;
+	}
+	struct Node* nodeAfter = LookUpByIndex(start, index+1);
+	if (nodeAfter == NULL) { //means that index given was last in list, so delete end
+		DeleteEnd(start);
+		return;
+	}
 
+	nodeBefore->next = nodeAfter;
+	free(nodeToDelete);
 }
 //• DONE InsertMiddle - insert a node in the middle of the list. (Hint: use the data
 //to know where to insert the node)
-//• DeleteFront - delete the first node in the list.
+//• DONE DeleteFront - delete the first node in the list.
 //• DeleteMiddle - delete a node in the middle of the list. (Hint: use the data
 //to know where to delete the node)
-//• DeleteEnd - delete a node at the end of the list.
+//• DONE DeleteEnd - delete a node at the end of the list.
 //• Traverse - traverse the list based on some key value in the data portion of
 //the node.
 //DONE • LookUpByIndex - find a particular node by an index number. Return -1 
@@ -346,14 +369,19 @@ int main() {
 	int listLength = GetListLength(&_head);
 	printf("Count: %d\n", listLength);
 
-	InsertByGPA(student1);
-	InsertByGPA(student2);
-	InsertByGPA(student3);
-	InsertByGPA(student4);
-	InsertByGPA(student5);
-	InsertByGPA(student6);
+	InsertByGPA(&_head, student1);
+	InsertByGPA(&_head, student2);
+	InsertByGPA(&_head, student3);
+	InsertByGPA(&_head, student4);
+	InsertByGPA(&_head, student5);
+	InsertByGPA(&_head, student6);
 	
-	PrintList();
+	PrintList(&_head);
+
+	DeleteMiddle(&_head, 2);
+	PrintList(&_head);
+
+
 
 	
 	listLength = GetListLength(&_head);
