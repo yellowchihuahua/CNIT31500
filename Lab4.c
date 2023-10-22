@@ -11,7 +11,6 @@ struct Node {
 
 	struct Node* next;
 };
-
 struct Node* _head = NULL;
 
 struct Node* CreateNode(char *firstName, char *lastName, char *major, float GPA){
@@ -45,26 +44,15 @@ void FreeList(){
 
 void PrintNode(struct Node* nodePointer){
 	printf("%s, %s, %s, %.2f\n", nodePointer->firstName, nodePointer->lastName, nodePointer->major, nodePointer->GPA);
-	//printf("%s, ", nodePointer->lastName);
-	//printf("%s, ", nodePointer->major);
-	//printf("%.2f\n", nodePointer->GPA);
 }
 
 void PrintList(){
-
 	if(_head == NULL){
 		printf("Empty list.\n");
 		return;
 	}
-
 	struct Node* current = _head;
 	while (current != NULL) {
-		//printf("%s\n", current->firstName);
-
-		//printf("%s, ", current->firstName);
-		//printf("%s, ", current->lastName);
-		//printf("%s, ", current->major);
-		//printf("%.2f\n", current->GPA);
 		PrintNode(current);
 		current = current->next;
 	}
@@ -73,8 +61,6 @@ void PrintList(){
 //InsertFront
 //ref ll.c example, TA in person assistance
 void InsertFront(struct Node* nodeToInsert){
-	//struct Node* nodeToInsert = CreateNode(firstName, lastName, major, GPA);
-
 	if (_head == NULL){
 		_head = nodeToInsert;
 		return;
@@ -83,11 +69,8 @@ void InsertFront(struct Node* nodeToInsert){
 	_head = nodeToInsert; //inserts node and sets pointer of new front, global varaible
 }
 
-//InsertEnd
+//InsertEnd generalized
 void InsertEnd(struct Node* nodeToInsert){
-
-	//struct Node* nodeToInsert = CreateNode(firstName, lastName, major, GPA);
-
 	//check if already has items
 	if (_head == NULL){
 		_head = nodeToInsert;
@@ -102,6 +85,7 @@ void InsertEnd(struct Node* nodeToInsert){
 	current->next = nodeToInsert;
 }
 
+//general usage, param index is the index to look up
 struct Node* LookUpByIndex(int index){
 	struct Node* current = _head;
 	int count = 0;
@@ -122,7 +106,7 @@ struct Node* LookUpByIndex(int index){
 	return NULL; //reached end of LL, no node with matching data
 }
 
-//general insert middle function, param index is the index before node to insert
+//general usage insert middle function, param index is the index before node to insert
 void InsertMiddle(int index, struct Node* nodeToInsert){
 	struct Node* previousNode = LookUpByIndex(index);
 	struct Node* nextNode = LookUpByIndex(index+1);
@@ -182,6 +166,7 @@ void ftoa(float n, char* res, int afterpoint)
     } 
 } 
 
+//not transferable, todo look at snprintf to generalize
 char* ToString(struct Node* node) {
 	//todo: look into snprintf
 	char nodeStr[256];
@@ -196,6 +181,7 @@ char* ToString(struct Node* node) {
 	strcat(nodeStr, gpaStr);
 }
 
+//not transferable to general linked list functionality?
 void InsertByGPA(struct Node* nodeToInsert) {	
 	if (_head == NULL) {
 		InsertFront(nodeToInsert);
@@ -233,7 +219,7 @@ void InsertByGPA(struct Node* nodeToInsert) {
 	printf("comparing from second item\n");
 	current = _head->next; //start iterating from second item to utilize InsertMiddle()
 	int count = 0; //counter, index to use InsertMiddle() on
-	while (current->next != NULL) {
+	while (current != NULL) {
 		currentStr[0] = '\0'; //clear strings
 		currentGpaStr[0] = '\0';
 		ftoa((5.0f-current->GPA), currentGpaStr, 2); //'inverse' of gpa goes first so i can sort completely alphabetically and still get largest gpa first
@@ -255,89 +241,9 @@ void InsertByGPA(struct Node* nodeToInsert) {
 	//reached the end of list and it's not bigger than anything, so inserting at end
 	printf("reached end of list, inserting at end\n");
 	InsertEnd(nodeToInsert);
-	return;
-	
 }
 
-//not transferable to general linked list functionality
-//void InsertByGPA(char firstName[64], char lastName[64], char major[64], float GPA) {
-//	struct Node* nodeToInsert = CreateNode(firstName, lastName, major, GPA);
-//
-//	if (_head == NULL){
-//		InsertFront(nodeToInsert);
-//	}
-//	else {
-//		if(nodeToInsert->GPA > _head->GPA) {
-//			InsertFront(nodeToInsert);
-//		} else if (nodeToInsert->GPA == _head->GPA) {
-//			int lastNameComp = strcmp(nodeToInsert->lastName, _head->lastName);
-//			if (lastNameComp < 0) {//smaller last name than current head, insert front
-//				//if bigger, do nothing and check for next nodes
-//				InsertFront(nodeToInsert);
-//			} else if (lastNameComp == 0) { //same last name, compare first name
-//				int firstNameComp = strcmp(nodeToInsert->firstName, _head->firstName);
-//				if (firstNameComp < 0) {//smaller last name than current head 
-//					InsertFront(nodeToInsert);
-//				} else if (firstNameComp == 0) { //same last name, first name, GPA->insert behind. bigger first name->check other nodes
-//					struct Node* temp = _head->next;
-//					_head->next = nodeToInsert;
-//					nodeToInsert = temp; 
-//				}
-//			}
-//		} 
-//		else {
-//			 //start traversing from second item
-//			struct Node* current = _head->next;
-//			struct Node* temp;
-//			int count = 0;
-//
-//			printf("traversing from second item\n");
-//			printf("current node: current->firstName is %s\n", current->firstName);
-//			while (current->next != NULL) {
-//				//PrintNode(current); //printing current node
-//				printf("comparing %.2f with %.2f\n", nodeToInsert->GPA, current->GPA);
-//				if(nodeToInsert->GPA > current->GPA) {
-//					InsertMiddle(count, nodeToInsert);
-//					printf("GPA is bigger than current node, inserting before current node\n");
-//				} else if (nodeToInsert->GPA == current->GPA) { //if gpa values are equal, make extra comparisons with last name and first name
-//					printf("GPA values are equal, comparing last names %s with %s\n", nodeToInsert->lastName, current->lastName);
-//					int lastNameComp = strcmp(nodeToInsert->lastName, current->lastName);
-//					if (lastNameComp < 0) {//smaller last name than current  
-//						printf("smaller last name than current node, inserting before current node\n");
-//						InsertMiddle(count, nodeToInsert);
-//					} else if (lastNameComp == 0) { //same last name, compare first name
-//						printf("same last name, comparing first names %s and %s\n", nodeToInsert->firstName, current->firstName);
-//						int firstNameComp = strcmp(nodeToInsert->firstName, current->firstName);
-//						if (firstNameComp < 0) {//smaller last name than current  
-//							printf("smaller last name than current, inserting before current node\n");
-//							InsertMiddle(count, nodeToInsert);
-//						} else if (firstNameComp == 0) { //same first name, insert here
-//							printf("same first name, just gonna insert after this\n");
-//							InsertMiddle(count+1, nodeToInsert);
-//						} 
-//					}
-//				} 
-//				if (current->next != NULL){
-//					current = current->next; //if not inserting before current node's stats, go next
-//					count++;
-//				}
-//				if(current->next == NULL){
-//					InsertEnd(nodeToInsert);
-//				}
-//			}
-//
-//			//if(current->next == NULL){
-//			//	InsertEnd(nodeToInsert);
-//			//}
-//		}
-//	}
-//
-//
-//}
-
-
-
-//• InsertMiddle - insert a node in the middle of the list. (Hint: use the data
+//• DONE InsertMiddle - insert a node in the middle of the list. (Hint: use the data
 //to know where to insert the node)
 //• DeleteFront - delete the first node in the list.
 //• DeleteMiddle - delete a node in the middle of the list. (Hint: use the data
