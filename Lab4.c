@@ -81,12 +81,12 @@ void PrintNode(struct Node* nodePointer){
 	printf("%s, %s, %s, %.2f\n", nodePointer->firstName, nodePointer->lastName, nodePointer->major, nodePointer->GPA);
 }
 
-void PrintList(){
-	if(_head == NULL){
+void PrintList(struct Node** start){
+	if(GetListLength(start) == 0){
 		printf("PrintList(); -- Empty list, nothing to print.\n");
 		return;
 	}
-	struct Node* current = _head;
+	struct Node* current = *start;
 	while (current != NULL) {
 		PrintNode(current);
 		current = current->next;
@@ -262,7 +262,18 @@ void DeleteFront() {
 	struct Node* temp = _head; //temp pointer to hold current head
 	_head = _head->next; //make head point to 2nd item in list
 	free(temp); //free temp pointer
-}
+
+
+//void DeleteFront(struct Node** start) {
+//	struct Node* head = *start;
+//	if (head == NULL) {
+//		printf("DeleteFront(); -- Empty list, nothing to delete\n");
+//		return;
+//	}
+//	struct Node* temp = head; //temp pointer to hold current head
+//	head = head->next; //make head point to 2nd item in list
+//	free(temp); //free temp pointer
+//}
 
 void DeleteEnd(){
 	if (_head == NULL) {
@@ -350,7 +361,11 @@ int main() {
 	InsertByGPA(&_head, student5);
 	InsertByGPA(&_head, student6);
 	
-	PrintList();
+	PrintList(&_head);
+
+	DeleteFront(&_head);
+
+	PrintList(&_head);
 
 	
 	listLength = GetListLength(&_head);
