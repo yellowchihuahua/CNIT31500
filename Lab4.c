@@ -4,6 +4,7 @@
 #include <math.h>
 
 struct Node {
+	int key;
 	char firstName[64];
 	char lastName[64];
 	char major[64];
@@ -12,6 +13,7 @@ struct Node {
 	struct Node* next;
 };
 struct Node* _head = NULL;
+int studentKeyCounter = 1;
 
 struct Node* CreateNode(char *firstName, char *lastName, char *major, float GPA){
 	struct Node *newNode = (struct Node*)malloc(sizeof(struct Node));
@@ -19,6 +21,9 @@ struct Node* CreateNode(char *firstName, char *lastName, char *major, float GPA)
 		printf("Failed memory allocation.\n");
 		exit(1);
 	}
+
+	newNode->key = studentKeyCounter;
+	studentKeyCounter++;
 
 	strcpy(newNode->firstName, firstName);
 	strcpy(newNode->lastName, lastName);
@@ -47,6 +52,26 @@ struct Node* LookUpByIndex(struct Node** start, int index){
 	}
 	printf("LookUpByIndex(); -- No node with matching index exists in list.\n");
 	return NULL; //reached end of LL, no node with matching data
+}
+
+int LookUpByKey(struct Node** start, int key) {
+	struct Node* current = *start;
+	int count = 0;
+
+	if(key < 1){
+		printf("LookUpByKey(); -- Given key is invalid (less than 1).\n");
+		return -1;
+	}
+
+	while (current != NULL && current->key != key) {
+		current = current->next;
+		count++;
+	}
+	if (current != NULL){
+		return count; 
+	}
+	printf("LookUpByKey(); -- No node with matching key exists in list.\n");
+	return -1; //reached end of LL, no node with matching data
 }
 
 //generalized function
@@ -78,7 +103,11 @@ void FreeList(){
 }
 
 void PrintNode(struct Node* nodePointer){
-	printf("%s, %s, %s, %.2f\n", nodePointer->firstName, nodePointer->lastName, nodePointer->major, nodePointer->GPA);
+	if (nodePointer == NULL) {
+		printf("PrintNode(); -- Given node is NULL, nothing to print.\n");
+		return;
+	}
+	printf("Key: %d | Data: %s, %s, %s, %.2f\n", nodePointer->key, nodePointer->firstName, nodePointer->lastName, nodePointer->major, nodePointer->GPA);
 }
 
 void PrintList(struct Node** start){
@@ -314,6 +343,7 @@ void DeleteMiddle(struct Node** start, int index){
 	nodeBefore->next = nodeAfter;
 	free(nodeToDelete);
 }
+
 //• DONE InsertMiddle - insert a node in the middle of the list. (Hint: use the data
 //to know where to insert the node)
 //• DONE DeleteFront - delete the first node in the list.
@@ -378,7 +408,10 @@ int main() {
 	
 	PrintList(&_head);
 
+	PrintNode(LookUpByIndex(&_head, LookUpByKey(&_head, 2)));
+
 	DeleteMiddle(&_head, 2);
+	PrintNode(LookUpByIndex(&_head, LookUpByKey(&_head, 1)));
 	PrintList(&_head);
 
 
