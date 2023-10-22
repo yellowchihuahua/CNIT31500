@@ -106,15 +106,15 @@ void InsertFront(struct Node** start, struct Node* nodeToInsert){
 }
 
 //InsertEnd generalized
-void InsertEnd(struct Node* nodeToInsert){
+void InsertEnd(struct Node** start, struct Node* nodeToInsert){
 	//check if already has items
-	if (_head == NULL){
-		_head = nodeToInsert;
+	if (GetListLength(start) == 0){
+		*start = nodeToInsert;
 		return;
 	}
 
 	//get to the last node in linked list
-	struct Node* current = _head;
+	struct Node* current = *start;
 	while(current->next != NULL){
 		current = current->next;
 	}
@@ -130,7 +130,7 @@ void InsertMiddle(int index, struct Node* nodeToInsert){
 		previousNode->next = nodeToInsert;
 		nodeToInsert->next = nextNode; //linking 
 	} else {
-		InsertEnd(nodeToInsert);
+		InsertEnd(&_head, nodeToInsert);
 	}
 }
 
@@ -255,7 +255,7 @@ void InsertByGPA(struct Node* nodeToInsert) {
 	}
 	//reached the end of list and it's not bigger than anything, so inserting at end
 	printf("reached end of list, inserting at end\n");
-	InsertEnd(nodeToInsert);
+	InsertEnd(&_head, nodeToInsert);
 }
 
 void DeleteFront() {
