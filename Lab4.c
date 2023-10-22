@@ -83,9 +83,9 @@ void InsertFront(struct Node* nodeToInsert){
 }
 
 //InsertEnd
-void InsertEnd(char firstName[64], char lastName[64], char major[64], float GPA){
+void InsertEnd(struct Node* nodeToInsert){
 
-	struct Node* nodeToInsert = CreateNode(firstName, lastName, major, GPA);
+	//struct Node* nodeToInsert = CreateNode(firstName, lastName, major, GPA);
 
 	//check if already has items
 	if (_head == NULL){
@@ -125,26 +125,24 @@ struct Node* LookUpByIndex(int index){
 void InsertMiddle(int index, struct Node* nodeToInsert){
 	struct Node* previousNode = LookUpByIndex(index);
 	struct Node* nextNode = LookUpByIndex(index+1);
-	previousNode->next = nodeToInsert;
-	nodeToInsert->next = nextNode; //linking 
+
+	if(nextNode != NULL) {
+		previousNode->next = nodeToInsert;
+		nodeToInsert->next = nextNode; //linking 
+	} else {
+		InsertEnd(nodeToInsert);
+	}
 }
 
 //not transferable to general linked list functionality
 void InsertByGPA(char firstName[64], char lastName[64], char major[64], float GPA) {
 	struct Node* nodeToInsert = CreateNode(firstName, lastName, major, GPA);
 
-	printf("inserting by gpa\n");
 	if (_head == NULL){
 		InsertFront(nodeToInsert);
-		printf("null list, inserting front\n");
 	}
 	else {
-
-		printf("checking against head\n");
-		//checking against head
-		printf("comparing %.2f with %.2f\n", nodeToInsert->GPA, _head->GPA);
 		if(nodeToInsert->GPA > _head->GPA) {
-			printf("bigger gpa than head, inserting front\n");
 			InsertFront(nodeToInsert);
 		} else if (nodeToInsert->GPA == _head->GPA) {
 			int lastNameComp = strcmp(nodeToInsert->lastName, _head->lastName);
@@ -163,13 +161,13 @@ void InsertByGPA(char firstName[64], char lastName[64], char major[64], float GP
 			}
 		} 
 		else {
-
-			printf("traversing from second item, smaller gpa than head\n");
 			 //start traversing from second item
 			struct Node* current = _head->next;
 			struct Node* temp;
 			int count = 0;
+
 			while (current->next != NULL) {
+				PrintNode(current); //printing current node
 				if(nodeToInsert->GPA > current->GPA) {
 					InsertMiddle(count, nodeToInsert);
 				} else if (nodeToInsert->GPA == current->GPA) { //if gpa values are equal, make extra comparisons with last name and first name
@@ -180,22 +178,19 @@ void InsertByGPA(char firstName[64], char lastName[64], char major[64], float GP
 						int firstNameComp = strcmp(nodeToInsert->firstName, current->firstName);
 						if (firstNameComp < 0) {//smaller last name than current  
 							InsertMiddle(count, nodeToInsert);
-						} else if (firstNameComp == 0) {
-							struct Node* temp = current->next;
-							current->next = nodeToInsert;
-							nodeToInsert = temp; //insert after current
-						} else {
-							current = current->next; //gonext if first name is later in the alphabet
-							count++;
-						}
-					} else {
-						current = current->next; //go next if last name is later in the alphabet
-						count++;
+						} else if (firstNameComp == 0) { //same first name, insert here
+							InsertMiddle(count+1, nodeToInsert);
+						} 
 					}
-				} else {
-					current = current->next; //if not higher than current node's gpa, go next
+				} 
+				if (current->next != NULL){
+					current = current->next; //if not inserting before current node's stats, go next
 					count++;
 				}
+			}
+
+			if(current->next == NULL){
+				InsertEnd(nodeToInsert);
 			}
 		}
 	}
@@ -236,6 +231,21 @@ int main() {
 	char student3Major[64] = "SAAD";
 	float student3GPA = 2.0;
 
+	char student4FirstName[64] = "Blow";
+	char student4LastName[64] = "Torch";
+	char student4Major[64] = "Business";
+	float student4GPA = 2.5;
+
+	char student5FirstName[64] = "Levi";
+	char student5LastName[64] = "Er";
+	char student5Major[64] = "CGT";
+	float student5GPA = 3.9;
+
+	char student6FirstName[64] = "Glow";
+	char student6LastName[64] = "Stone";
+	char student6Major[64] = "SAAD";
+	float student6GPA = 2.0;
+
 
 
 	// CreatListNode
@@ -245,6 +255,10 @@ int main() {
 	InsertByGPA(student1FirstName, student1LastName, student1Major, student1GPA);
 	InsertByGPA(student2FirstName, student2LastName, student2Major, student2GPA);
 	InsertByGPA(student3FirstName, student3LastName, student3Major, student3GPA);
+	InsertByGPA(student4FirstName, student4LastName, student4Major, student4GPA);
+	InsertByGPA(student5FirstName, student5LastName, student5Major, student5GPA);
+	InsertByGPA(student6FirstName, student6LastName, student6Major, student6GPA);
+	
 	PrintList();
 
 
