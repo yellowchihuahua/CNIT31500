@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <math.h>
 
 struct Node {
 	char firstName[64];
@@ -134,69 +135,205 @@ void InsertMiddle(int index, struct Node* nodeToInsert){
 	}
 }
 
-//not transferable to general linked list functionality
-void InsertByGPA(char firstName[64], char lastName[64], char major[64], float GPA) {
-	struct Node* nodeToInsert = CreateNode(firstName, lastName, major, GPA);
+//ref https://www.geeksforgeeks.org/convert-floating-point-number-string/#
+void ReverseString(char* str, int len) 
+{ 
+    int i = 0, j = len - 1, temp; 
+    while (i < j) { 
+        temp = str[i]; 
+        str[i] = str[j]; 
+        str[j] = temp; 
+        i++; 
+        j--; 
+    } 
+} 
 
-	if (_head == NULL){
-		InsertFront(nodeToInsert);
-	}
-	else {
-		if(nodeToInsert->GPA > _head->GPA) {
-			InsertFront(nodeToInsert);
-		} else if (nodeToInsert->GPA == _head->GPA) {
-			int lastNameComp = strcmp(nodeToInsert->lastName, _head->lastName);
-			if (lastNameComp < 0) {//smaller last name than current head, insert front
-				//if bigger, do nothing and check for next nodes
-				InsertFront(nodeToInsert);
-			} else if (lastNameComp == 0) { //same last name, compare first name
-				int firstNameComp = strcmp(nodeToInsert->firstName, _head->firstName);
-				if (firstNameComp < 0) {//smaller last name than current head 
-					InsertFront(nodeToInsert);
-				} else if (firstNameComp == 0) { //same last name, first name, GPA->insert behind. bigger first name->check other nodes
-					struct Node* temp = _head->next;
-					_head->next = nodeToInsert;
-					nodeToInsert = temp; 
-				}
-			}
-		} 
-		else {
-			 //start traversing from second item
-			struct Node* current = _head->next;
-			struct Node* temp;
-			int count = 0;
+//ref https://www.geeksforgeeks.org/convert-floating-point-number-string/#
+int IntToStr(int x, char str[], int d) 
+{ 
+    int i = 0; 
+    while (x) { 
+        str[i++] = (x % 10) + '0'; 
+        x = x / 10; 
+    } 
+ 
+    while (i < d) 
+        str[i++] = '0'; 
+ 
+    ReverseString(str, i); 
+    str[i] = '\0'; 
+    return i; 
+} 
 
-			while (current->next != NULL) {
-				PrintNode(current); //printing current node
-				if(nodeToInsert->GPA > current->GPA) {
-					InsertMiddle(count, nodeToInsert);
-				} else if (nodeToInsert->GPA == current->GPA) { //if gpa values are equal, make extra comparisons with last name and first name
-					int lastNameComp = strcmp(nodeToInsert->lastName, current->lastName);
-					if (lastNameComp < 0) {//smaller last name than current head 
-						InsertMiddle(count, nodeToInsert);
-					} else if (lastNameComp == 0) { //same last name, compare first name
-						int firstNameComp = strcmp(nodeToInsert->firstName, current->firstName);
-						if (firstNameComp < 0) {//smaller last name than current  
-							InsertMiddle(count, nodeToInsert);
-						} else if (firstNameComp == 0) { //same first name, insert here
-							InsertMiddle(count+1, nodeToInsert);
-						} 
-					}
-				} 
-				if (current->next != NULL){
-					current = current->next; //if not inserting before current node's stats, go next
-					count++;
-				}
-			}
+//ref https://www.geeksforgeeks.org/convert-floating-point-number-string/#
+void ftoa(float n, char* res, int afterpoint) 
+{ 
+    int ipart = (int)n; 
+    float fpart = n - (float)ipart; 
+ 
+    int i = IntToStr(ipart, res, 0); 
 
-			if(current->next == NULL){
-				InsertEnd(nodeToInsert);
-			}
-		}
-	}
+    if (afterpoint != 0) { 
+        res[i] = '.'; // add dot 
+ 
+        fpart = fpart * pow(10, afterpoint); 
+ 
+        IntToStr((int)fpart, res + i + 1, afterpoint); 
+    } 
+} 
 
-
+char* ToString(struct Node* node) {
+	//todo: look into snprintf
+	char nodeStr[256];
+	strcpy(nodeStr, node->firstName);
+	strcat(nodeStr, ", ");
+	strcat(nodeStr, node->lastName);
+	strcat(nodeStr, ", ");
+	strcat(nodeStr, node->major);
+	strcat(nodeStr, ", ");
+	char gpaStr[10];
+	ftoa(node->GPA, gpaStr, 2);
+	strcat(nodeStr, gpaStr);
 }
+
+void InsertByGPA(struct Node* nodeToInsert) {	
+	if (_head == NULL) {
+		InsertFront(nodeToInsert);
+		printf("head is null, putting it in front\n");
+		return;
+	} 
+	//compare with head first
+
+	char nodeToInsertStr[256]; //convert it to a string to compare entir ething alphabetically
+	char toInsertGpaStr[10];
+	ftoa((9.0-nodeToInsert->GPA), toInsertGpaStr, 2); //'inverse' of gpa goes first so i can sort completely alphabetically and still get largest gpa first
+	strcpy(nodeToInsertStr, toInsertGpaStr); 
+	strcat(nodeToInsertStr, nodeToInsert->lastName);
+	strcat(nodeToInsertStr, nodeToInsert->firstName);
+	strcat(nodeToInsertStr, nodeToInsert->major);
+
+	printf("NODE TO INSERT COMPARING STRING: %s \n", nodeToInsertStr);
+
+	struct Node* current = _head;
+	char currentStr[256]; 
+	char currentGpaStr[10];
+	ftoa((9.0-current->GPA), currentGpaStr, 2); //'inverse' of gpa goes first so i can sort completely alphabetically and still get largest gpa first
+	strcpy(currentStr, currentGpaStr); 
+	strcat(currentStr, current->lastName); //insert the rest of them to compare alphabetically in order
+	strcat(currentStr, current->firstName);
+	strcat(currentStr, current->major);
+
+	int comp = strcmp(nodeToInsertStr, currentStr);
+	if(comp < 0) {//smaller alphabetically
+		InsertFront(nodeToInsert);
+		printf("smaller alphabetically than head, putting in front\n");
+		return;
+	}
+
+	printf("comparing from second item\n");
+	current = _head->next; //start iterating from second item to utilize InsertMiddle()
+	int count = 0; //counter, index to use InsertMiddle() on
+	while (current->next != NULL) {
+		currentStr[0] = '\0'; //clear strings
+		currentGpaStr[0] = '\0';
+		ftoa((9.0-current->GPA), currentGpaStr, 2); //'inverse' of gpa goes first so i can sort completely alphabetically and still get largest gpa first
+		strcpy(currentStr, currentGpaStr); 
+		strcat(currentStr, current->lastName); //insert the rest of them to compare alphabetically in order
+		strcat(currentStr, current->firstName);
+		strcat(currentStr, current->major);
+		printf("CURRENT NODE COMPARING STRING: %s\n", currentStr);
+		comp = strcmp(nodeToInsertStr, currentStr);
+		
+		if(comp < 0) { //alphabetically smaller, inserting before current node
+			printf("smaller alphabetically than current, inserting before %s\n", ToString(current));
+			InsertMiddle(count, nodeToInsert);
+			return;
+		}
+		current = current->next;
+		count++;
+	}
+	//reached the end of list and it's not bigger than anything, so inserting at end
+	printf("reached end of list, inserting at end\n");
+	InsertEnd(nodeToInsert);
+	return;
+	
+}
+
+//not transferable to general linked list functionality
+//void InsertByGPA(char firstName[64], char lastName[64], char major[64], float GPA) {
+//	struct Node* nodeToInsert = CreateNode(firstName, lastName, major, GPA);
+//
+//	if (_head == NULL){
+//		InsertFront(nodeToInsert);
+//	}
+//	else {
+//		if(nodeToInsert->GPA > _head->GPA) {
+//			InsertFront(nodeToInsert);
+//		} else if (nodeToInsert->GPA == _head->GPA) {
+//			int lastNameComp = strcmp(nodeToInsert->lastName, _head->lastName);
+//			if (lastNameComp < 0) {//smaller last name than current head, insert front
+//				//if bigger, do nothing and check for next nodes
+//				InsertFront(nodeToInsert);
+//			} else if (lastNameComp == 0) { //same last name, compare first name
+//				int firstNameComp = strcmp(nodeToInsert->firstName, _head->firstName);
+//				if (firstNameComp < 0) {//smaller last name than current head 
+//					InsertFront(nodeToInsert);
+//				} else if (firstNameComp == 0) { //same last name, first name, GPA->insert behind. bigger first name->check other nodes
+//					struct Node* temp = _head->next;
+//					_head->next = nodeToInsert;
+//					nodeToInsert = temp; 
+//				}
+//			}
+//		} 
+//		else {
+//			 //start traversing from second item
+//			struct Node* current = _head->next;
+//			struct Node* temp;
+//			int count = 0;
+//
+//			printf("traversing from second item\n");
+//			printf("current node: current->firstName is %s\n", current->firstName);
+//			while (current->next != NULL) {
+//				//PrintNode(current); //printing current node
+//				printf("comparing %.2f with %.2f\n", nodeToInsert->GPA, current->GPA);
+//				if(nodeToInsert->GPA > current->GPA) {
+//					InsertMiddle(count, nodeToInsert);
+//					printf("GPA is bigger than current node, inserting before current node\n");
+//				} else if (nodeToInsert->GPA == current->GPA) { //if gpa values are equal, make extra comparisons with last name and first name
+//					printf("GPA values are equal, comparing last names %s with %s\n", nodeToInsert->lastName, current->lastName);
+//					int lastNameComp = strcmp(nodeToInsert->lastName, current->lastName);
+//					if (lastNameComp < 0) {//smaller last name than current  
+//						printf("smaller last name than current node, inserting before current node\n");
+//						InsertMiddle(count, nodeToInsert);
+//					} else if (lastNameComp == 0) { //same last name, compare first name
+//						printf("same last name, comparing first names %s and %s\n", nodeToInsert->firstName, current->firstName);
+//						int firstNameComp = strcmp(nodeToInsert->firstName, current->firstName);
+//						if (firstNameComp < 0) {//smaller last name than current  
+//							printf("smaller last name than current, inserting before current node\n");
+//							InsertMiddle(count, nodeToInsert);
+//						} else if (firstNameComp == 0) { //same first name, insert here
+//							printf("same first name, just gonna insert after this\n");
+//							InsertMiddle(count+1, nodeToInsert);
+//						} 
+//					}
+//				} 
+//				if (current->next != NULL){
+//					current = current->next; //if not inserting before current node's stats, go next
+//					count++;
+//				}
+//				if(current->next == NULL){
+//					InsertEnd(nodeToInsert);
+//				}
+//			}
+//
+//			//if(current->next == NULL){
+//			//	InsertEnd(nodeToInsert);
+//			//}
+//		}
+//	}
+//
+//
+//}
 
 
 
@@ -220,44 +357,53 @@ int main() {
 	char student1LastName[64] = "Stack";
 	char student1Major[64] = "NET";
 	float student1GPA = 3.0;
+	struct Node* student1 = CreateNode(student1FirstName, student1LastName, student1Major, student1GPA);
 
 	char student2FirstName[64] = "Haye";
-	char student2LastName[64] = "Bail";
+	char student2LastName[64] = "Zail";
 	char student2Major[64] = "CSEC";
-	float student2GPA = 6.0;
+	float student2GPA = 4.0;
+	struct Node* student2 = CreateNode(student2FirstName, student2LastName, student2Major, student2GPA);
 
 	char student3FirstName[64] = "Redd";
 	char student3LastName[64] = "Stone";
 	char student3Major[64] = "SAAD";
 	float student3GPA = 2.0;
+	struct Node* student3 = CreateNode(student3FirstName, student3LastName, student3Major, student3GPA);
 
 	char student4FirstName[64] = "Blow";
 	char student4LastName[64] = "Torch";
 	char student4Major[64] = "Business";
 	float student4GPA = 2.5;
+	struct Node* student4 = CreateNode(student4FirstName, student4LastName, student4Major, student4GPA);
 
 	char student5FirstName[64] = "Levi";
 	char student5LastName[64] = "Er";
 	char student5Major[64] = "CGT";
 	float student5GPA = 3.9;
+	struct Node* student5 = CreateNode(student5FirstName, student5LastName, student5Major, student5GPA);
 
 	char student6FirstName[64] = "Glow";
 	char student6LastName[64] = "Stone";
 	char student6Major[64] = "SAAD";
 	float student6GPA = 2.0;
+	struct Node* student6 = CreateNode(student6FirstName, student6LastName, student6Major, student6GPA);
+
+	printf("nodes created\n");
 
 
-
-	// CreatListNode
-	//InsertEnd(student1FirstName, student1LastName, student1Major, student1GPA);
-	//InsertEnd(student2FirstName, student2LastName, student2Major, student2GPA);
-	//InsertEnd(student3FirstName, student3LastName, student3Major, student3GPA);
-	InsertByGPA(student1FirstName, student1LastName, student1Major, student1GPA);
-	InsertByGPA(student2FirstName, student2LastName, student2Major, student2GPA);
-	InsertByGPA(student3FirstName, student3LastName, student3Major, student3GPA);
-	InsertByGPA(student4FirstName, student4LastName, student4Major, student4GPA);
-	InsertByGPA(student5FirstName, student5LastName, student5Major, student5GPA);
-	InsertByGPA(student6FirstName, student6LastName, student6Major, student6GPA);
+	printf("inserting student 1: %s\n", ToString(student1));
+	InsertByGPA(student1);
+	printf("inserting student 2: %s\n", ToString(student2));
+	InsertByGPA(student2);
+	printf("inserting student 3: %s\n", ToString(student3));
+	InsertByGPA(student3);
+	printf("inserting student 4: %s\n", ToString(student4));
+	InsertByGPA(student4);
+	printf("inserting student 5: %s\n", ToString(student5));
+	InsertByGPA(student5);
+	printf("inserting student 6: %s\n", ToString(student6));
+	InsertByGPA(student6);
 	
 	PrintList();
 
