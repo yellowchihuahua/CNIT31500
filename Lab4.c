@@ -274,15 +274,15 @@ void DeleteFront(struct Node** start) {
 	free(temp); //free temp pointer
 }
 
-void DeleteEnd(){
-	if (_head == NULL) {
+void DeleteEnd(struct Node** start){
+	if (GetListLength(start) == 0) {
 		printf("DeleteEnd(); -- Empty list, nothing to delete\n");
 		return;
 	}
-	if (_head->next == NULL) {
-		FreeList(_head);
+	if ((*start)->next == NULL) {
+		FreeList(*start);
 	}
-	struct Node* current = _head;
+	struct Node* current = *start;
 	while (current->next->next != NULL) {
 		current = current->next;
 	}
@@ -363,7 +363,9 @@ int main() {
 	PrintList(&_head);
 
 	DeleteFront(&_head);
+	PrintList(&_head);
 
+	DeleteEnd(&_head);
 	PrintList(&_head);
 
 	
