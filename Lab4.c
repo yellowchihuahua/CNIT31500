@@ -54,6 +54,25 @@ struct Node* LookUpByIndex(struct Node** start, int index){
 	return NULL; //reached end of LL, no node with matching data
 }
 
+int GetKeyByIndex(struct Node** start, int index){
+	if (index < 0){
+		printf("GetKeyByIndex(struct Node** start, int index); -- Given index is invalid (less than 0).\n");
+		return -1;
+	}
+
+	struct Node* current = *start;
+	int count = 0;
+	while (current != NULL && count < index) {
+		current = current->next;
+		count++;
+	}
+	if(current != NULL) {
+		return current->key;
+	}
+	printf("LookUpByIndex(struct Node** start, int index); -- No node with matching index exists in list.\n");
+	return -1;
+}
+
 int GetIndexByKey(struct Node** start, int key) {
 	if(key < 1){
 		printf("GetIndexByKey(struct Node** start, int key); -- Given key is invalid (less than 1).\n");
@@ -88,6 +107,23 @@ struct Node* LookUpByKey(struct Node** start, int key) {
 	}
 	printf("LookUpByKey(struct Node** start, int key); -- No node with matching key exists in list.\n");
 	return NULL; //reached end of LL, no node with matching data
+}
+
+int receiveIntInput(char *prompt, int minInclusive){
+    int value = -1;
+    do {
+        char input[5];
+        printf("%s", prompt);
+        scanf("%s", &input);
+        value = atoi(input);
+
+        if (value < minInclusive) {
+            printf("That is an invalid entry, please enter a valid integer over %i.\n", minInclusive);
+            value = -1;
+        }
+    } while (value == -1);
+
+    return value;
 }
 
 //generalized function
@@ -154,7 +190,7 @@ void ftoa(float n, char* res, int afterpoint)
     } 
 } 
 
-//not transferable, todo look at snprintf to generalize
+//NOT FUNCTIONAL, todo: look at snprintf to generalize
 char* ToString(struct Node* node) {
 	//todo: look into snprintf
 	if(node == NULL){
@@ -366,73 +402,146 @@ void DeleteMiddle(struct Node** start, int index){
 }
 
 int main() {
+
+	int cont = 1;
+	int userInputCounter = 0;
+	
+	do {
+		int functionNumber = 0;
+        printf("\n===============================================================================\n");
+        printf("Hi User! You have used %i functions within this program so far!\n", userInputCounter);
+        printf("Here are your options: \n");
+        printf("(1) Print all students in linked list\n");
+        printf("(2) Insert a student to linked list by GPA order\n");
+        printf("(3) Delete a student from linked list\n");
+        printf("(4) Find a student from linked list\n");
+        printf("(5) Exit the program\n");
+        //functionNumber = receiveIntInput("Enter the number of the function you would like to use (1-5): ", 1);
+
+		printf("Enter the number you would like to use (1-5): ");
+		scanf("%d", &functionNumber);
+		userInputCounter++;
+
+
+		switch(functionNumber){
+			case 1:
+				printf("Here is the list of all your students: --------------------------------------------\n");
+				PrintList(&_head);
+				printf("-----------------------------------------------------------------------------------\n");
+				break;
+
+			case 2:
+				//insert a student to linked list
+				char newStudentFirstName[64], newStudentLastName[64], newStudentMajor[64];
+				float newStudentGPA;
+				char newStudentGPAStr[8];
+				printf("Type your inputs and press enter:\n");
+				printf("New student's First Name: ");
+                scanf("%s", newStudentFirstName);
+                printf("New student's Last Name: ");
+                scanf("%s", newStudentLastName);
+                printf("New student's Major: ");
+                scanf("%s", newStudentMajor);
+                printf("New student's GPA: ");
+                scanf("%s", &newStudentGPAStr);
+				newStudentGPA = atof(newStudentGPAStr);
+
+				struct Node* newStudent = CreateNode(newStudentFirstName, newStudentLastName, newStudentMajor, newStudentGPA);
+				printf("Adding node: ");
+				PrintNode(newStudent);
+				InsertByGPA(&_head, newStudent);
+				printf("New node added!\n");
+
+
+				break;
+
+			case 3:
+				//delete a student from linked list
+				break;
+
+			case 4:
+				//find a student from linked list
+				break;
+
+			case 5:
+				cont = 0;
+				FreeList();
+				break;
+			default:
+				printf("\nSorry, that is an invalid input.\n");
+				userInputCounter--;
+		}
 		
-	char student1FirstName[64] = "Cole";
-	char student1LastName[64] = "Stack";
-	char student1Major[64] = "NET";
-	float student1GPA = 3.0;
-	struct Node* student1 = CreateNode(student1FirstName, student1LastName, student1Major, student1GPA);
+	} while (cont == 1);
 
-	char student2FirstName[64] = "Haye";
-	char student2LastName[64] = "Zail";
-	char student2Major[64] = "CSEC";
-	float student2GPA = 4.0;
-	struct Node* student2 = CreateNode(student2FirstName, student2LastName, student2Major, student2GPA);
-
-	char student3FirstName[64] = "Redd";
-	char student3LastName[64] = "Stone";
-	char student3Major[64] = "SAAD";
-	float student3GPA = 2.0;
-	struct Node* student3 = CreateNode(student3FirstName, student3LastName, student3Major, student3GPA);
-
-	char student4FirstName[64] = "Blow";
-	char student4LastName[64] = "Torch";
-	char student4Major[64] = "Business";
-	float student4GPA = 2.5;
-	struct Node* student4 = CreateNode(student4FirstName, student4LastName, student4Major, student4GPA);
-
-	char student5FirstName[64] = "Levi";
-	char student5LastName[64] = "Er";
-	char student5Major[64] = "CGT";
-	float student5GPA = 3.9;
-	struct Node* student5 = CreateNode(student5FirstName, student5LastName, student5Major, student5GPA);
-
-	char student6FirstName[64] = "Glow";
-	char student6LastName[64] = "Stone";
-	char student6Major[64] = "SAAD";
-	float student6GPA = 2.0;
-	struct Node* student6 = CreateNode(student6FirstName, student6LastName, student6Major, student6GPA);
-
-	int listLength = GetListLength(&_head);
-	printf("Count: %d\n", listLength);
-
-	InsertByGPA(&_head, student1);
-	InsertByGPA(&_head, student2);
-	InsertByGPA(&_head, student3);
-	InsertByGPA(&_head, student4);
-	InsertByGPA(&_head, student5);
-	InsertByGPA(&_head, student6);
-	
-	PrintList(&_head);
-
-	PrintNode(LookUpByIndex(&_head, GetIndexByKey(&_head, 2)));
-
-	DeleteMiddle(&_head, 2);
-	PrintNode(LookUpByIndex(&_head, GetIndexByKey(&_head, 1)));
-	PrintList(&_head);
-	PrintNode(LookUpByKey(&_head, 2));
-
-
-
-	
-	listLength = GetListLength(&_head);
-	printf("Count: %d\n", listLength);
-
-
-	char inputChar;
-	printf("Press any key to exit: ");
-	scanf("%c", &inputChar);
-
-	FreeList();
 	return 0;
+	//
+	//char student1FirstName[64] = "Cole";
+	//char student1LastName[64] = "Stack";
+	//char student1Major[64] = "NET";
+	//float student1GPA = 3.0;
+	//struct Node* student1 = CreateNode(student1FirstName, student1LastName, student1Major, student1GPA);
+//
+	//char student2FirstName[64] = "Haye";
+	//char student2LastName[64] = "Zail";
+	//char student2Major[64] = "CSEC";
+	//float student2GPA = 4.0;
+	//struct Node* student2 = CreateNode(student2FirstName, student2LastName, student2Major, student2GPA);
+//
+	//char student3FirstName[64] = "Redd";
+	//char student3LastName[64] = "Stone";
+	//char student3Major[64] = "SAAD";
+	//float student3GPA = 2.0;
+	//struct Node* student3 = CreateNode(student3FirstName, student3LastName, student3Major, student3GPA);
+//
+	//char student4FirstName[64] = "Blow";
+	//char student4LastName[64] = "Torch";
+	//char student4Major[64] = "Business";
+	//float student4GPA = 2.5;
+	//struct Node* student4 = CreateNode(student4FirstName, student4LastName, student4Major, student4GPA);
+//
+	//char student5FirstName[64] = "Levi";
+	//char student5LastName[64] = "Er";
+	//char student5Major[64] = "CGT";
+	//float student5GPA = 3.9;
+	//struct Node* student5 = CreateNode(student5FirstName, student5LastName, student5Major, student5GPA);
+//
+	//char student6FirstName[64] = "Glow";
+	//char student6LastName[64] = "Stone";
+	//char student6Major[64] = "SAAD";
+	//float student6GPA = 2.0;
+	//struct Node* student6 = CreateNode(student6FirstName, student6LastName, student6Major, student6GPA);
+//
+	//int listLength = GetListLength(&_head);
+	//printf("Count: %d\n", listLength);
+//
+	//InsertByGPA(&_head, student1);
+	//InsertByGPA(&_head, student2);
+	//InsertByGPA(&_head, student3);
+	//InsertByGPA(&_head, student4);
+	//InsertByGPA(&_head, student5);
+	//InsertByGPA(&_head, student6);
+	//
+	//PrintList(&_head);
+//
+	//PrintNode(LookUpByIndex(&_head, GetIndexByKey(&_head, 2)));
+//
+	//DeleteMiddle(&_head, 2);
+	//PrintNode(LookUpByIndex(&_head, GetIndexByKey(&_head, 1)));
+	//PrintList(&_head);
+	//PrintNode(LookUpByKey(&_head, 2));
+//
+//
+//
+	//
+	//listLength = GetListLength(&_head);
+	//printf("Count: %d\n", listLength);
+//
+//
+	//char inputChar;
+	//printf("Press any key to exit: ");
+	//scanf("%c", &inputChar);
+//
+	//FreeList();
+	//return 0;
 }
