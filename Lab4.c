@@ -55,14 +55,13 @@ struct Node* LookUpByIndex(struct Node** start, int index){
 }
 
 int GetIndexByKey(struct Node** start, int key) {
-	struct Node* current = *start;
-	int count = 0;
-
 	if(key < 1){
 		printf("GetIndexByKey(struct Node** start, int key); -- Given key is invalid (less than 1).\n");
 		return -1;
 	}
-
+	
+	struct Node* current = *start;
+	int count = 0;
 	while (current != NULL && current->key != key) {
 		current = current->next;
 		count++;
@@ -72,6 +71,23 @@ int GetIndexByKey(struct Node** start, int key) {
 	}
 	printf("GetIndexByKey(struct Node** start, int key); -- No node with matching key exists in list.\n");
 	return -1; //reached end of LL, no node with matching data
+}
+
+struct Node* LookUpByKey(struct Node** start, int key) {
+	if(key < 1){
+		printf("GetIndexByKey(struct Node** start, int key); -- Given key is invalid (less than 1).\n");
+		return NULL;
+	}
+	
+	struct Node* current = *start;
+	while (current != NULL && current->key != key) {
+		current = current->next;
+	}
+	if (current != NULL){
+		return current; 
+	}
+	printf("LookUpByKey(struct Node** start, int key); -- No node with matching key exists in list.\n");
+	return NULL; //reached end of LL, no node with matching data
 }
 
 //generalized function
@@ -137,7 +153,6 @@ void ftoa(float n, char* res, int afterpoint)
         IntToStr((int)fpart, res + i + 1, afterpoint); 
     } 
 } 
-
 
 //not transferable, todo look at snprintf to generalize
 char* ToString(struct Node* node) {
@@ -290,7 +305,7 @@ void InsertByGPA(struct Node** start, struct Node* nodeToInsert) {
 	InsertEnd(start, nodeToInsert);
 }
 
-//void DeleteFront() {
+// EXAMPLE: void DeleteFront() { WHERE _is global
 //	if (_head == NULL) {
 //		printf("DeleteFront(); -- Empty list, nothing to delete\n");
 //		return;
@@ -350,20 +365,6 @@ void DeleteMiddle(struct Node** start, int index){
 	free(nodeToDelete);
 }
 
-//� DONE InsertMiddle - insert a node in the middle of the list. (Hint: use the data
-//to know where to insert the node)
-//� DONE DeleteFront - delete the first node in the list.
-//� DeleteMiddle - delete a node in the middle of the list. (Hint: use the data
-//to know where to delete the node)
-//� DONE DeleteEnd - delete a node at the end of the list.
-//� Traverse - traverse the list based on some key value in the data portion of
-//the node.
-//DONE � LookUpByIndex - find a particular node by an index number. Return -1 
-//if that index does not exist.
-//DONE� PrintNode � print information in the current node: first name, last name,
-//major, and GPA
-
-
 int main() {
 		
 	char student1FirstName[64] = "Cole";
@@ -419,6 +420,7 @@ int main() {
 	DeleteMiddle(&_head, 2);
 	PrintNode(LookUpByIndex(&_head, GetIndexByKey(&_head, 1)));
 	PrintList(&_head);
+	PrintNode(LookUpByKey(&_head, 2));
 
 
 
