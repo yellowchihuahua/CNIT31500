@@ -109,7 +109,7 @@ struct Node* LookUpByKey(struct Node** start, int key) {
 	return NULL; //reached end of LL, no node with matching data
 }
 
-int receiveIntInput(char *prompt, int minInclusive){
+int ReceiveIntInput(char *prompt, int minInclusive){
     int value = -1;
     do {
         char input[5];
@@ -231,12 +231,12 @@ void PrintList(struct Node** start){
 }
 
 //ref https://stackoverflow.com/questions/6417158/c-how-to-free-nodes-in-the-linked-list
-void FreeList(){
+void FreeList(struct Node** start){
 //traverse through and free allocated memory
-	struct Node* temp;
-    while (_head != NULL) {
-        temp = _head;
-		_head = _head->next;
+	struct Node* temp = *start;
+    while ((*start) != NULL) {
+        temp = (*start);
+		(*start) = _head->next;
 		free(temp);
     }
 }
@@ -366,7 +366,7 @@ void DeleteEnd(struct Node** start){
 		return;
 	}
 	if ((*start)->next == NULL) {
-		FreeList(*start);
+		FreeList(start);
 	}
 	struct Node* current = *start;
 	while (current->next->next != NULL) {
@@ -413,12 +413,13 @@ int main() {
         printf("Here are your options: \n");
         printf("(1) Print all students in linked list\n");
         printf("(2) Insert a student to linked list by GPA order\n");
-        printf("(3) Delete a student from linked list\n");
-        printf("(4) Find a student from linked list\n");
-        printf("(5) Exit the program\n");
-        //functionNumber = receiveIntInput("Enter the number of the function you would like to use (1-5): ", 1);
+        printf("(3) Delete a student from linked list using their key ID\n");
+        printf("(4) Delete a student from linked list using their list index\n");
+        printf("(5) Find a student from linked list\n");
+        printf("(6) Exit the program\n");
+        //functionNumber =ReceiveIntInput("Enter the number of the function you would like to use (1-5): ", 1);
 
-		printf("Enter the number you would like to use (1-5): ");
+		printf("Enter the number you would like to use (1-6): ");
 		scanf("%d", &functionNumber);
 		userInputCounter++;
 
@@ -459,20 +460,24 @@ int main() {
 					printf("New node added!\n");
 				} else {
 					printf("Add node action cancelled.\n");
+					studentKeyCounter--;//free usage of ID
 				}
 				break;
 
 			case 3:
-				//delete a student from linked list
+				//delete a student from linked list by key
 				break;
 
 			case 4:
-				//find a student from linked list
+				//delete student from ll by index
 				break;
 
 			case 5:
+				//search engine for all fields basically, need ToString up and running first
+				break;
+			case 6:
 				cont = 0;
-				FreeList();
+				FreeList(&_head);
 				break;
 			default:
 				printf("\nSorry, that is an invalid input.\n");
@@ -482,73 +487,5 @@ int main() {
 	} while (cont == 1);
 
 	return 0;
-	//
-	//char student1FirstName[64] = "Cole";
-	//char student1LastName[64] = "Stack";
-	//char student1Major[64] = "NET";
-	//float student1GPA = 3.0;
-	//struct Node* student1 = CreateNode(student1FirstName, student1LastName, student1Major, student1GPA);
-//
-	//char student2FirstName[64] = "Haye";
-	//char student2LastName[64] = "Zail";
-	//char student2Major[64] = "CSEC";
-	//float student2GPA = 4.0;
-	//struct Node* student2 = CreateNode(student2FirstName, student2LastName, student2Major, student2GPA);
-//
-	//char student3FirstName[64] = "Redd";
-	//char student3LastName[64] = "Stone";
-	//char student3Major[64] = "SAAD";
-	//float student3GPA = 2.0;
-	//struct Node* student3 = CreateNode(student3FirstName, student3LastName, student3Major, student3GPA);
-//
-	//char student4FirstName[64] = "Blow";
-	//char student4LastName[64] = "Torch";
-	//char student4Major[64] = "Business";
-	//float student4GPA = 2.5;
-	//struct Node* student4 = CreateNode(student4FirstName, student4LastName, student4Major, student4GPA);
-//
-	//char student5FirstName[64] = "Levi";
-	//char student5LastName[64] = "Er";
-	//char student5Major[64] = "CGT";
-	//float student5GPA = 3.9;
-	//struct Node* student5 = CreateNode(student5FirstName, student5LastName, student5Major, student5GPA);
-//
-	//char student6FirstName[64] = "Glow";
-	//char student6LastName[64] = "Stone";
-	//char student6Major[64] = "SAAD";
-	//float student6GPA = 2.0;
-	//struct Node* student6 = CreateNode(student6FirstName, student6LastName, student6Major, student6GPA);
-//
-	//int listLength = GetListLength(&_head);
-	//printf("Count: %d\n", listLength);
-//
-	//InsertByGPA(&_head, student1);
-	//InsertByGPA(&_head, student2);
-	//InsertByGPA(&_head, student3);
-	//InsertByGPA(&_head, student4);
-	//InsertByGPA(&_head, student5);
-	//InsertByGPA(&_head, student6);
-	//
-	//PrintList(&_head);
-//
-	//PrintNode(LookUpByIndex(&_head, GetIndexByKey(&_head, 2)));
-//
-	//DeleteMiddle(&_head, 2);
-	//PrintNode(LookUpByIndex(&_head, GetIndexByKey(&_head, 1)));
-	//PrintList(&_head);
-	//PrintNode(LookUpByKey(&_head, 2));
-//
-//
-//
-	//
-	//listLength = GetListLength(&_head);
-	//printf("Count: %d\n", listLength);
-//
-//
-	//char inputChar;
-	//printf("Press any key to exit: ");
-	//scanf("%c", &inputChar);
-//
-	//FreeList();
-	//return 0;
+
 }
