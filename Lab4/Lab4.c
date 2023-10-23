@@ -225,6 +225,7 @@ void PrintList(struct Node** start){
 	}
 	struct Node* current = *start;
 	while (current != NULL) {
+		printf("Index: %d | ", GetIndexByKey(&_head, current->key));
 		PrintNode(current);
 		current = current->next;
 	}
@@ -389,11 +390,14 @@ void DeleteMiddle(struct Node** start, int index){
 	struct Node* nodeBefore = LookUpByIndex(start, index-1);
 	if(nodeBefore == NULL) { //means the index given was 0, so delete front node
 		DeleteFront(start);
+		printf("DeleteMiddle(struct Node** start, int index); -- Requested node to delete is start of list, deleting head node.\n");
+
 		return;
 	}
 	struct Node* nodeAfter = LookUpByIndex(start, index+1);
 	if (nodeAfter == NULL) { //means that index given was last in list, so delete end
 		DeleteEnd(start);
+		printf("DeleteMiddle(struct Node** start, int index); -- Requested node to delete is end of list, deleting end node.\n");
 		return;
 	}
 
@@ -426,13 +430,15 @@ int main() {
 
 		switch(functionNumber){
 			case 1:
-				printf("Here is the list of all your students: --------------------------------------------\n");
+				printf("Here is the list of all your students: ----------------------------------------\n");
 				PrintList(&_head);
-				printf("-----------------------------------------------------------------------------------\n");
+				printf("-------------------------------------------------------------------------------\n");
 				break;
 
 			case 2:
 				//insert a student to linked list
+				printf("Enter the information of the student you would like to add.\n");
+
 				char newStudentFirstName[64], newStudentLastName[64], newStudentMajor[64];
 				float newStudentGPA;
 				char newStudentGPAStr[8];
@@ -447,16 +453,16 @@ int main() {
                 scanf("%s", &newStudentGPAStr);
 				newStudentGPA = atof(newStudentGPAStr);
 
-				struct Node* newStudent = CreateNode(newStudentFirstName, newStudentLastName, newStudentMajor, newStudentGPA);
+				struct Node* currentStudent = CreateNode(newStudentFirstName, newStudentLastName, newStudentMajor, newStudentGPA);
 				printf("Node to add: ");
-				PrintNode(newStudent);
+				PrintNode(currentStudent);
 
 				char confirmation[1] = "n";
 				printf("Enter y to confirm this is correct, any other key to deny: ");
 				scanf("%s", confirmation);
 				
 				if(strcmp(confirmation, "y") == 0){
-					InsertByGPA(&_head, newStudent);
+					InsertByGPA(&_head, currentStudent);
 					printf("New node added!\n");
 				} else {
 					printf("Add node action cancelled.\n");
@@ -466,10 +472,73 @@ int main() {
 
 			case 3:
 				//delete a student from linked list by key
+				printf("Enter the key of the student you would like to delete.\n");
+
+				int delStudentKey;
+				char delStudentKeyStr[64];
+				printf("Student key: ");
+                scanf("%s", delStudentKeyStr);
+				delStudentKey = atoi(delStudentKeyStr);
+
+				//validate if node exists with this key
+				currentStudent = LookUpByKey(&_head, delStudentKey);
+				if (currentStudent == NULL) {
+					printf("int main(); -- Student does not exist with key %d.\n", delStudentKey);
+					printf("No action has been performed.");
+					break;
+				}
+
+				//print node before confirming
+				printf("Student to delete: \n");
+				PrintNode(currentStudent);
+
+				//confirm action
+				confirmation[0]='n';
+				printf("Enter y to confirm this is correct, any other key to deny: ");
+				scanf("%s", confirmation);
+				if(strcmp(confirmation, "y") == 0){
+					//do action
+					DeleteMiddle(&_head, GetIndexByKey(&_head, delStudentKey));
+					printf("Node deleted!\n");
+					break;
+				} 
+				printf("Delete node by key action cancelled.\n");
 				break;
 
 			case 4:
 				//delete student from ll by index
+				printf("Enter the index of the student you would like to delete.\n");
+				printf("Reminder: indices start from 0.\n");
+
+				int delStudentIndex;
+				char delStudentIndexStr[64];
+				printf("Student index: ");
+                scanf("%s", delStudentIndexStr);
+				delStudentIndex = atoi(delStudentIndexStr);
+
+				//validate if node exists with this key
+				currentStudent = LookUpByIndex(&_head, delStudentIndex);
+				if (currentStudent == NULL) {
+					printf("int main(); -- Student does not exist with index %d.\n", delStudentIndex);
+					printf("No action has been performed.");
+					break;
+				}
+
+				//print node before confirming
+				printf("Student to delete: \n");
+				PrintNode(currentStudent);
+
+				//confirm action
+				confirmation[0]='n';
+				printf("Enter y to confirm this is correct, any other key to deny: ");
+				scanf("%s", confirmation);
+				if(strcmp(confirmation, "y") == 0){
+					//do action
+					DeleteMiddle(&_head, delStudentIndex);
+					printf("Node deleted!\n");
+					break;
+				} 
+				printf("Delete node by index action cancelled.\n");
 				break;
 
 			case 5:
