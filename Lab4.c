@@ -18,7 +18,7 @@ int studentKeyCounter = 1;
 struct Node* CreateNode(char *firstName, char *lastName, char *major, float GPA){
 	struct Node *newNode = (struct Node*)malloc(sizeof(struct Node));
 	if (newNode == NULL) {
-		printf("Failed memory allocation.\n");
+		printf("CreateNode(char *firstName, char *lastName, char *major, float GPA); -- Failed memory allocation.\n");
 		exit(1);
 	}
 
@@ -39,7 +39,7 @@ struct Node* LookUpByIndex(struct Node** start, int index){
 	int count = 0;
 
 	if(index < 0){
-		printf("LookUpByIndex(); -- Given index is less than 0.\n");
+		printf("LookUpByIndex(struct Node** start, int index); -- Given index is less than 0.\n");
 		return NULL;
 	}
 
@@ -50,16 +50,16 @@ struct Node* LookUpByIndex(struct Node** start, int index){
 	if (current != NULL){
 		return current; 
 	}
-	printf("LookUpByIndex(); -- No node with matching index exists in list.\n");
+	printf("LookUpByIndex(struct Node** start, int index); -- No node with matching index exists in list.\n");
 	return NULL; //reached end of LL, no node with matching data
 }
 
-int LookUpByKey(struct Node** start, int key) {
+int GetIndexByKey(struct Node** start, int key) {
 	struct Node* current = *start;
 	int count = 0;
 
 	if(key < 1){
-		printf("LookUpByKey(); -- Given key is invalid (less than 1).\n");
+		printf("GetIndexByKey(struct Node** start, int key); -- Given key is invalid (less than 1).\n");
 		return -1;
 	}
 
@@ -70,7 +70,7 @@ int LookUpByKey(struct Node** start, int key) {
 	if (current != NULL){
 		return count; 
 	}
-	printf("LookUpByKey(); -- No node with matching key exists in list.\n");
+	printf("GetIndexByKey(struct Node** start, int key); -- No node with matching key exists in list.\n");
 	return -1; //reached end of LL, no node with matching data
 }
 
@@ -89,78 +89,6 @@ int GetListLength(struct Node** start){
 	}
 
 	return count;
-}
-
-//ref https://stackoverflow.com/questions/6417158/c-how-to-free-nodes-in-the-linked-list
-void FreeList(){
-//traverse through and free allocated memory
-	struct Node* temp;
-    while (_head != NULL) {
-        temp = _head;
-		_head = _head->next;
-		free(temp);
-    }
-}
-
-void PrintNode(struct Node* nodePointer){
-	if (nodePointer == NULL) {
-		printf("PrintNode(); -- Given node is NULL, nothing to print.\n");
-		return;
-	}
-	printf("Key: %d | Data: %s, %s, %s, %.2f\n", nodePointer->key, nodePointer->firstName, nodePointer->lastName, nodePointer->major, nodePointer->GPA);
-}
-
-void PrintList(struct Node** start){
-	if(GetListLength(start) == 0){
-		printf("PrintList(); -- Empty list, nothing to print.\n");
-		return;
-	}
-	struct Node* current = *start;
-	while (current != NULL) {
-		PrintNode(current);
-		current = current->next;
-	}
-}
-
-//InsertFront
-//ref ll.c example, TA in person assistance
-void InsertFront(struct Node** start, struct Node* nodeToInsert){
-	if (GetListLength(start) == 0){
-		*start = nodeToInsert;
-		return;
-	}
-	
-	nodeToInsert->next = *start; //points next var to front of list, global variable
-	*start = nodeToInsert; //inserts node and sets pointer of new front, global varaible
-}
-
-//InsertEnd generalized
-void InsertEnd(struct Node** start, struct Node* nodeToInsert){
-	//check if already has items
-	if (GetListLength(start) == 0){
-		*start = nodeToInsert;
-		return;
-	}
-
-	//get to the last node in linked list
-	struct Node* current = *start;
-	while(current->next != NULL){
-		current = current->next;
-	}
-	current->next = nodeToInsert;
-}
-
-//param index is the index before node to insert
-void InsertMiddle(struct Node** start, int index, struct Node* nodeToInsert){
-	struct Node* previousNode = LookUpByIndex(start, index);
-	struct Node* nextNode = LookUpByIndex(start, index+1);
-
-	if(nextNode != NULL) {
-		previousNode->next = nodeToInsert;
-		nodeToInsert->next = nextNode; //linking 
-	} else {
-		InsertEnd(start, nodeToInsert);
-	}
 }
 
 //ref https://www.geeksforgeeks.org/convert-floating-point-number-string/#
@@ -210,9 +138,15 @@ void ftoa(float n, char* res, int afterpoint)
     } 
 } 
 
+
 //not transferable, todo look at snprintf to generalize
 char* ToString(struct Node* node) {
 	//todo: look into snprintf
+	if(node == NULL){
+		printf("ToString(struct Node* node); -- Node is null, nothing to convert.\n");
+		return '\0';
+	}
+
 	char nodeStr[256];
 	strcpy(nodeStr, node->firstName);
 	strcat(nodeStr, ", ");
@@ -224,6 +158,83 @@ char* ToString(struct Node* node) {
 	ftoa(node->GPA, gpaStr, 2);
 	strcat(nodeStr, gpaStr);
 }
+
+void PrintNode(struct Node* node){
+	if (node == NULL) {
+		printf("PrintNode(struct Node* node); -- Given node is NULL, nothing to print.\n");
+		return;
+	}
+	printf("Key: %d | Data: %s, %s, %s, %.2f\n", node->key, node->firstName, node->lastName, node->major, node->GPA);
+}
+
+void PrintList(struct Node** start){
+	if(GetListLength(start) == 0){
+		printf("PrintList(struct Node** start); -- Empty list, nothing to print.\n");
+		return;
+	}
+	struct Node* current = *start;
+	while (current != NULL) {
+		PrintNode(current);
+		current = current->next;
+	}
+}
+
+//ref https://stackoverflow.com/questions/6417158/c-how-to-free-nodes-in-the-linked-list
+void FreeList(){
+//traverse through and free allocated memory
+	struct Node* temp;
+    while (_head != NULL) {
+        temp = _head;
+		_head = _head->next;
+		free(temp);
+    }
+}
+
+//InsertFront
+//ref ll.c example, TA in person assistance
+void InsertFront(struct Node** start, struct Node* nodeToInsert){
+	if (GetListLength(start) == 0){
+		*start = nodeToInsert;
+		return;
+	}
+	
+	nodeToInsert->next = *start; //points next var to front of list, global variable
+	*start = nodeToInsert; //inserts node and sets pointer of new front, global varaible
+}
+
+//InsertEnd generalized
+void InsertEnd(struct Node** start, struct Node* nodeToInsert){
+	//check if already has items
+	if (GetListLength(start) == 0){
+		*start = nodeToInsert;
+		return;
+	}
+
+	//get to the last node in linked list
+	struct Node* current = *start;
+	while(current->next != NULL){
+		current = current->next;
+	}
+	current->next = nodeToInsert;
+}
+
+//param index is the index before node to insert
+void InsertMiddle(struct Node** start, int index, struct Node* nodeToInsert){
+	struct Node* previousNode = LookUpByIndex(start, index);
+	struct Node* nextNode = LookUpByIndex(start, index+1);
+
+	if(previousNode == NULL){ //if index is at beginning
+		InsertFront(start, nodeToInsert);
+		return;
+	}
+	if (nextNode == NULL) { //if index is at end
+		InsertEnd(start, nodeToInsert);
+		return;
+	}
+	previousNode->next = nodeToInsert;
+	nodeToInsert->next = nextNode; //linking 
+}
+
 
 //not transferable to general linked list functionality?
 void InsertByGPA(struct Node** start, struct Node* nodeToInsert) {	
@@ -256,7 +267,6 @@ void InsertByGPA(struct Node** start, struct Node* nodeToInsert) {
 		return;
 	}
 
-	printf("comparing from second item\n");
 	current = (*start)->next; //start iterating from second item to utilize InsertMiddle()
 	int count = 0; //counter, index to use InsertMiddle() on
 	while (current != NULL) {
@@ -267,11 +277,9 @@ void InsertByGPA(struct Node** start, struct Node* nodeToInsert) {
 		strcat(currentStr, current->lastName); //insert the rest of them to compare alphabetically in order
 		strcat(currentStr, current->firstName);
 		strcat(currentStr, current->major);
-		printf("CURRENT NODE COMPARING STRING: %s\n", currentStr);
 		comp = strcmp(nodeToInsertStr, currentStr);
 		
 		if(comp < 0) { //alphabetically smaller, inserting before current node
-			printf("smaller alphabetically than current, inserting before %s\n", ToString(current));
 			InsertMiddle(start, count, nodeToInsert);
 			return;
 		}
@@ -279,7 +287,6 @@ void InsertByGPA(struct Node** start, struct Node* nodeToInsert) {
 		count++;
 	}
 	//reached the end of list and it's not bigger than anything, so inserting at end
-	printf("reached end of list, inserting at end\n");
 	InsertEnd(start, nodeToInsert);
 }
 
@@ -292,10 +299,9 @@ void InsertByGPA(struct Node** start, struct Node* nodeToInsert) {
 //	_head = _head->next; //make head point to 2nd item in list
 //	free(temp); //free temp pointer
 
-
 void DeleteFront(struct Node** start) {
 	if (GetListLength(start) == 0) {
-		printf("DeleteFront(); -- Empty list, nothing to delete\n");
+		printf("DeleteFront(struct Node** start); -- Empty list, nothing to delete\n");
 		return;
 	}
 	struct Node* temp = *start; //temp pointer to hold current head
@@ -305,7 +311,7 @@ void DeleteFront(struct Node** start) {
 
 void DeleteEnd(struct Node** start){
 	if (GetListLength(start) == 0) {
-		printf("DeleteEnd(); -- Empty list, nothing to delete\n");
+		printf("DeleteEnd(struct Node** start); -- Empty list, nothing to delete\n");
 		return;
 	}
 	if ((*start)->next == NULL) {
@@ -321,12 +327,12 @@ void DeleteEnd(struct Node** start){
 
 void DeleteMiddle(struct Node** start, int index){
 	if (GetListLength(start) == 0) {
-		printf("DeleteMiddle(); -- Empty list, nothing to delete.\n");
+		printf("DeleteMiddle(struct Node** start, int index); -- Empty list, nothing to delete.\n");
 		return;
 	}
 	struct Node* nodeToDelete = LookUpByIndex(start, index);
 	if(nodeToDelete == NULL) {
-		printf("DeleteMiddle(); -- No node exists at given index to delete.\n");
+		printf("DeleteMiddle(struct Node** start, int index); -- No node exists at given index to delete.\n");
 		return;
 	}
 	struct Node* nodeBefore = LookUpByIndex(start, index-1);
@@ -344,17 +350,17 @@ void DeleteMiddle(struct Node** start, int index){
 	free(nodeToDelete);
 }
 
-//• DONE InsertMiddle - insert a node in the middle of the list. (Hint: use the data
+//ï¿½ DONE InsertMiddle - insert a node in the middle of the list. (Hint: use the data
 //to know where to insert the node)
-//• DONE DeleteFront - delete the first node in the list.
-//• DeleteMiddle - delete a node in the middle of the list. (Hint: use the data
+//ï¿½ DONE DeleteFront - delete the first node in the list.
+//ï¿½ DeleteMiddle - delete a node in the middle of the list. (Hint: use the data
 //to know where to delete the node)
-//• DONE DeleteEnd - delete a node at the end of the list.
-//• Traverse - traverse the list based on some key value in the data portion of
+//ï¿½ DONE DeleteEnd - delete a node at the end of the list.
+//ï¿½ Traverse - traverse the list based on some key value in the data portion of
 //the node.
-//DONE • LookUpByIndex - find a particular node by an index number. Return -1 
+//DONE ï¿½ LookUpByIndex - find a particular node by an index number. Return -1 
 //if that index does not exist.
-//DONE• PrintNode – print information in the current node: first name, last name,
+//DONEï¿½ PrintNode ï¿½ print information in the current node: first name, last name,
 //major, and GPA
 
 
@@ -408,10 +414,10 @@ int main() {
 	
 	PrintList(&_head);
 
-	PrintNode(LookUpByIndex(&_head, LookUpByKey(&_head, 2)));
+	PrintNode(LookUpByIndex(&_head, GetIndexByKey(&_head, 2)));
 
 	DeleteMiddle(&_head, 2);
-	PrintNode(LookUpByIndex(&_head, LookUpByKey(&_head, 1)));
+	PrintNode(LookUpByIndex(&_head, GetIndexByKey(&_head, 1)));
 	PrintList(&_head);
 
 
