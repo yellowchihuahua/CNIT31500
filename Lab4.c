@@ -447,12 +447,19 @@ int main() {
 				newStudentGPA = atof(newStudentGPAStr);
 
 				struct Node* newStudent = CreateNode(newStudentFirstName, newStudentLastName, newStudentMajor, newStudentGPA);
-				printf("Adding node: ");
+				printf("Node to add: ");
 				PrintNode(newStudent);
-				InsertByGPA(&_head, newStudent);
-				printf("New node added!\n");
 
-
+				char confirmation[1] = "n";
+				printf("Enter y to confirm this is correct, any other key to deny: ");
+				scanf("%s", confirmation);
+				
+				if(strcmp(confirmation, "y") == 0){
+					InsertByGPA(&_head, newStudent);
+					printf("New node added!\n");
+				} else {
+					printf("Add node action cancelled.\n");
+				}
 				break;
 
 			case 3:
