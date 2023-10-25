@@ -190,32 +190,40 @@ void ftoa(float n, char* res, int afterpoint)
     } 
 } 
 
-//NOT FUNCTIONAL, todo: look at snprintf to generalize
-char* ToString(struct Node* node) {
-	//todo: look into snprintf
+//ref https://stackoverflow.com/questions/25798977/returning-string-from-c-function
+//function to convert node to strictly comma separated data
+//param info extra: string is string to use; allocate WITH SIZE before calling this function. similar to scanf. refer to reference link
+void ToCsv(char *string, struct Node* node) {
 	if(node == NULL){
-		printf("ToString(struct Node* node); -- Node is null, nothing to convert.\n");
-		return '\0';
+		printf("ToCsv(char *string, struct Node* node); -- Node is null, nothing to convert.\n");
+		return;
 	}
-
-	char nodeStr[256];
-	strcpy(nodeStr, node->firstName);
-	strcat(nodeStr, ", ");
-	strcat(nodeStr, node->lastName);
-	strcat(nodeStr, ", ");
-	strcat(nodeStr, node->major);
-	strcat(nodeStr, ", ");
-	char gpaStr[10];
-	ftoa(node->GPA, gpaStr, 2);
-	strcat(nodeStr, gpaStr);
+	
+	snprintf(string, 256, "%d, %s, %s, %s, %.2f\n", node->key, node->firstName, node->lastName, node->major, node->GPA);
 }
 
+//ref https://stackoverflow.com/questions/25798977/returning-string-from-c-function
+//function to create readable format
+//param info extra: string is string to use; allocate WITH SIZE before calling this function. similar to scanf. refer to reference link
+void ToString(char *string, struct Node* node) {
+	//todo: look into snprintf
+	if(node == NULL){
+		printf("ToString(char *string, struct Node* node); -- Node is null, nothing to convert.\n");
+		return;
+	}
+	snprintf(string, 256, "Key: %d | Data: %s, %s, %s, %.2f\n", node->key, node->firstName, node->lastName, node->major, node->GPA);
+}
+
+//in print format
 void PrintNode(struct Node* node){
 	if (node == NULL) {
 		printf("PrintNode(struct Node* node); -- Given node is NULL, nothing to print.\n");
 		return;
 	}
-	printf("Key: %d | Data: %s, %s, %s, %.2f\n", node->key, node->firstName, node->lastName, node->major, node->GPA);
+	//printf("Key: %d | Data: %s, %s, %s, %.2f\n", node->key, node->firstName, node->lastName, node->major, node->GPA);
+	char nodeStr[256];
+	ToString(nodeStr, node);
+	printf("%s", nodeStr);
 }
 
 void PrintList(struct Node** start){
@@ -543,6 +551,11 @@ int main() {
 
 			case 5:
 				//search engine for all fields basically, need ToString up and running first
+				currentStudent = LookUpByIndex(&_head, 0);
+
+				char currentStudentString[256];
+				ToCsv(currentStudentString, currentStudent);
+				printf("%s", currentStudentString);
 				break;
 			case 6:
 				cont = 0;
