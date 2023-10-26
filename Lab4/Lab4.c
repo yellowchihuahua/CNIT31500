@@ -15,6 +15,7 @@ struct Node {
 struct Node* _head = NULL;
 int studentKeyCounter = 1;
 
+// *needs to be changed if struct Node changes (data received and processed)
 struct Node* CreateNode(char *firstName, char *lastName, char *major, float GPA){
 	struct Node *newNode = (struct Node*)malloc(sizeof(struct Node));
 	if (newNode == NULL) {
@@ -37,12 +38,10 @@ struct Node* CreateNode(char *firstName, char *lastName, char *major, float GPA)
 struct Node* LookUpByIndex(struct Node** start, int index){
 	struct Node* current = *start;
 	int count = 0;
-
 	if(index < 0){
 		printf("LookUpByIndex(struct Node** start, int index); -- Given index is less than 0.\n");
 		return NULL;
 	}
-
 	while (current != NULL && count < index) {
 		current = current->next;
 		count++;
@@ -51,6 +50,22 @@ struct Node* LookUpByIndex(struct Node** start, int index){
 		return current; 
 	}
 	printf("LookUpByIndex(struct Node** start, int index); -- No node with matching index exists in list.\n");
+	return NULL; //reached end of LL, no node with matching data
+}
+
+struct Node* LookUpByKey(struct Node** start, int key) {
+	if(key < 1){
+		printf("LookUpByKey(struct Node** start, int key); -- Given key is invalid (less than 1).\n");
+		return NULL;
+	}
+	struct Node* current = *start;
+	while (current != NULL && current->key != key) {
+		current = current->next;
+	}
+	if (current != NULL){
+		return current; 
+	}
+	printf("LookUpByKey(struct Node** start, int key); -- No node with matching key exists in list.\n");
 	return NULL; //reached end of LL, no node with matching data
 }
 
@@ -69,7 +84,7 @@ int GetKeyByIndex(struct Node** start, int index){
 	if(current != NULL) {
 		return current->key;
 	}
-	printf("LookUpByIndex(struct Node** start, int index); -- No node with matching index exists in list.\n");
+	printf("GetKeyByIndex(struct Node** start, int index); -- No node with matching index exists in list.\n");
 	return -1;
 }
 
@@ -92,41 +107,6 @@ int GetIndexByKey(struct Node** start, int key) {
 	return -1; //reached end of LL, no node with matching data
 }
 
-struct Node* LookUpByKey(struct Node** start, int key) {
-	if(key < 1){
-		printf("GetIndexByKey(struct Node** start, int key); -- Given key is invalid (less than 1).\n");
-		return NULL;
-	}
-	
-	struct Node* current = *start;
-	while (current != NULL && current->key != key) {
-		current = current->next;
-	}
-	if (current != NULL){
-		return current; 
-	}
-	printf("LookUpByKey(struct Node** start, int key); -- No node with matching key exists in list.\n");
-	return NULL; //reached end of LL, no node with matching data
-}
-
-int ReceiveIntInput(char *prompt, int minInclusive){
-    int value = -1;
-    do {
-        char input[5];
-        printf("%s", prompt);
-        scanf("%s", &input);
-        value = atoi(input);
-
-        if (value < minInclusive) {
-            printf("That is an invalid entry, please enter a valid integer over %i.\n", minInclusive);
-            value = -1;
-        }
-    } while (value == -1);
-
-    return value;
-}
-
-//generalized function
 int GetListLength(struct Node** start){
 	int count = 0;
 	struct Node* head = *start;
@@ -164,9 +144,7 @@ int IntToStr(int x, char str[], int d)
         str[i++] = (x % 10) + '0'; 
         x = x / 10; 
     } 
- 
-    while (i < d) 
-        str[i++] = '0'; 
+    while (i < d) str[i++] = '0'; 
  
     ReverseString(str, i); 
     str[i] = '\0'; 
@@ -193,8 +171,10 @@ int ftoa(float n, char* res, int afterpoint)
 } 
 
 //ref https://stackoverflow.com/questions/25798977/returning-string-from-c-function
-//function to convert node to strictly comma separated data
-//param info extra: string is string to use; allocate WITH SIZE before calling this function. similar to scanf. refer to reference link
+// *needs to be changed if struct Node changes (snprintf statement)
+//Converts node to CSV format. Usage:
+//char newNodeCsvString[256];
+//ToCsv(node, newNodeCsvString);
 //returns 0 if unsuccessful, 1 if successful
 int ToCsv(struct Node* node, char *string) {
 	if(node == NULL){
@@ -207,8 +187,10 @@ int ToCsv(struct Node* node, char *string) {
 }
 
 //ref https://stackoverflow.com/questions/25798977/returning-string-from-c-function
-//function to create readable format
-//param info extra: string is string to use; allocate WITH SIZE before calling this function. similar to scanf. refer to reference link
+// *needs to be changed if struct Node changes (snprintf statement)
+//Converts node to human readable format. Usage: //usage:
+//char newNodeString[256];
+//ToCsv(node, newNodeString);
 //returns 0 if unsuccessful, 1 if successful
 int ToString(struct Node* node, char *string) {
 	//todo: look into snprintf
@@ -220,13 +202,11 @@ int ToString(struct Node* node, char *string) {
 	return 1;
 }
 
-//in print format
 void PrintNode(struct Node* node){
 	if (node == NULL) {
 		printf("PrintNode(struct Node* node); -- Given node is NULL, nothing to print.\n");
 		return;
 	}
-	//printf("Key: %d | Data: %s, %s, %s, %.2f\n", node->key, node->firstName, node->lastName, node->major, node->GPA);
 	char nodeStr[256];
 	ToString(node, nodeStr);
 	printf("%s", nodeStr);
@@ -241,6 +221,21 @@ void PrintList(struct Node** start){
 	while (current != NULL) {
 		printf("Index: %d | ", GetIndexByKey(&_head, current->key));
 		PrintNode(current);
+		current = current->next;
+	}
+}
+
+//Traverse() functionality?
+//ref https://stackoverflow.com/questions/15098936/simple-way-to-check-if-a-string-contains-another-string-in-c
+void PrintSearch(struct Node** start, char* searchRequest) {
+	struct Node* current = *start;
+	char nodeString[256];
+
+	while(current != NULL) {
+		ToCsv(current, nodeString);
+		if(strstr(nodeString, searchRequest) != NULL){
+			PrintNode(current);
+		}
 		current = current->next;
 	}
 }
@@ -260,15 +255,13 @@ void FreeList(struct Node** start){
 //ref ll.c example, TA in person assistance
 int InsertFront(struct Node** start, struct Node* nodeToInsert){
 	if(nodeToInsert == NULL) {
-		printf("InsertFront(struct Node** start, int index, struct Node* nodeToInsert); -- Node is null, nothing to insert.\n");
+		printf("InsertFront(struct Node** start, struct Node* nodeToInsert); -- Node is null, nothing to insert.\n");
 		return 0;
 	}
-
 	if (GetListLength(start) == 0){
 		*start = nodeToInsert;
 		return 1;
 	}
-	
 	nodeToInsert->next = *start; //points next var to front of list, global variable
 	*start = nodeToInsert; //inserts node and sets pointer of new front, global varaible
 	return 1;
@@ -278,17 +271,13 @@ int InsertFront(struct Node** start, struct Node* nodeToInsert){
 //returns 0 if unsuccessful, 1 if successful
 int InsertEnd(struct Node** start, struct Node* nodeToInsert){
 	if(nodeToInsert == NULL) {
-		printf("InsertEnd(struct Node** start, int index, struct Node* nodeToInsert); -- Node is null, nothing to insert.\n");
+		printf("InsertEnd(struct Node** start, struct Node* nodeToInsert); -- Node is null, nothing to insert.\n");
 		return 0;
 	}
-
-	//check if already has items
 	if (GetListLength(start) == 0){
 		*start = nodeToInsert;
 		return 1;
 	}
-
-	//get to the last node in linked list
 	struct Node* current = *start;
 	while(current->next != NULL){
 		current = current->next;
@@ -322,8 +311,9 @@ int InsertMiddle(struct Node** start, int index, struct Node* nodeToInsert){
 	return 1;
 }
 
-//function to streamline InsertByGPA. converts entire node to a string in order of comparison to use strcmp to sort entire thing alphabetically
-//param info: refer to ToString and ToCsv usage
+// *needs to be changed if struct Node changes (snprintf usage)
+//Created to streamline InsertByGPA. Converts entire node to a string in order of comparison priority to use strcmp to sort entire thing alphabetically
+//Usage: refer to ToString and ToCsv usage
 //returns 0 if unsuccessful, 1 if successful
 int ToComparisonString(struct Node* node, char* string){
 	if(node == NULL){
@@ -341,6 +331,7 @@ int ToComparisonString(struct Node* node, char* string){
 	return 1;
 }
 
+// *needs to be changed if struct Node changes
 //not transferable to general linked list functionality?
 //returns 0 if unsuccessful, 1 if successful
 int InsertByGPA(struct Node** start, struct Node* nodeToInsert) {	
@@ -389,16 +380,6 @@ int InsertByGPA(struct Node** start, struct Node* nodeToInsert) {
 	return 1;
 }
 
-// EXAMPLE: void DeleteFront() { WHERE _is global
-//	if (_head == NULL) {
-//		printf("DeleteFront(); -- Empty list, nothing to delete\n");
-//		return;
-//	}
-//	struct Node* temp = _head; //temp pointer to hold current head
-//	_head = _head->next; //make head point to 2nd item in list
-//	free(temp); //free temp pointer
-
-
 //returns 0 if unsuccessful, 1 if successful
 int DeleteFront(struct Node** start) {
 	if (GetListLength(start) == 0) {
@@ -418,7 +399,7 @@ int DeleteEnd(struct Node** start){
 		printf("DeleteEnd(struct Node** start); -- Empty list, nothing to delete\n");
 		return 0;
 	}
-	if ((*start)->next == NULL) {
+	if ((*start)->next == NULL) { //free head if head is only item
 		FreeList(start);
 	}
 	struct Node* current = *start;
@@ -441,18 +422,16 @@ int DeleteMiddle(struct Node** start, int index){
 		printf("DeleteMiddle(struct Node** start, int index); -- No node exists at given index to delete.\n");
 		return 0;
 	}
-
-
-	if(index == 0) { //means the index given was 0, so delete front node
+	
+	//check ends
+	if(index == 0) { 
 		DeleteFront(start);
 		return 1;
 	}
-
-	if (index == GetListLength(start)) { //means that index given was last in list, so delete end
+	if (index == GetListLength(start)) { 
 		DeleteEnd(start);
 		return 1;
 	}
-
 	struct Node* nodeBefore = LookUpByIndex(start, index-1);
 	struct Node* nodeAfter = LookUpByIndex(start, index+1);
 	nodeBefore->next = nodeAfter;
@@ -460,29 +439,14 @@ int DeleteMiddle(struct Node** start, int index){
 	return 1;
 }
 
-//Traverse() functionality?
-//ref https://stackoverflow.com/questions/15098936/simple-way-to-check-if-a-string-contains-another-string-in-c
-void PrintSearch(struct Node** start, char* request) {
-	struct Node* current = *start;
-	char nodeString[256];
-
-	printf("Key | First Name, Last Name, Major, GPA\n");
-	while(current != NULL) {
-		ToCsv(current, nodeString);
-		if(strstr(nodeString, request) != NULL){
-			PrintNode(current);
-		}
-		current = current->next;
-	}
-}
-
-int main() {
-
+void DisplayMenu(){
+	
 	int cont = 1;
 	int userInputCounter = 0;
 	
 	do {
 		int functionNumber = 0;
+		char input[4];
         printf("\n===============================================================================\n");
         printf("Hi User! You have used %i functions within this program so far!\n", userInputCounter);
         printf("Here are your options: \n");
@@ -492,10 +456,10 @@ int main() {
         printf("(4) Delete a student from linked list using their list index\n");
         printf("(5) Find a student from linked list\n");
         printf("(6) Exit the program\n");
-        //functionNumber =ReceiveIntInput("Enter the number of the function you would like to use (1-5): ", 1);
 
 		printf("Enter the number you would like to use (1-6): ");
-		scanf("%d", &functionNumber);
+		scanf("%s", input); //receiving as string then converting to int validates value
+		functionNumber = atoi(input);
 		userInputCounter++;
 
 
@@ -503,7 +467,7 @@ int main() {
 			case 1:
 				printf("\nHere is the list of all your students: ----------------------------------------\n");
 				PrintList(&_head);
-				printf("-------------------------------------------------------------------------------\n");
+				printf("\nEND OF LIST--------------------------------------------------------------------\n");
 				break;
 
 			case 2:
@@ -557,7 +521,7 @@ int main() {
 				currentStudent = LookUpByKey(&_head, delStudentKey);
 				if (currentStudent == NULL) {
 					printf("int main(); -- Student does not exist with key %d.\n", delStudentKey);
-					printf("No action has been performed.");
+					printf("No action has been performed.\n");
 					break;
 				}
 
@@ -595,7 +559,7 @@ int main() {
 				currentStudent = LookUpByIndex(&_head, delStudentIndex);
 				if (currentStudent == NULL) {
 					printf("int main(); -- Student does not exist with index %d.\n", delStudentIndex);
-					printf("No action has been performed.");
+					printf("No action has been performed.\n");
 					break;
 				}
 
@@ -626,9 +590,11 @@ int main() {
 				printf("Your search request: ");
 				scanf("%s", searchString);
 
-				printf("\nYour search results: \n");
 
+				printf("Key: | Data: FirstName, LastName, Major, GPA\n");
+				printf("\nYour search results: ----------------------------------------------------------\n");
 				PrintSearch(&_head, searchString);
+				printf("\nEND OF LIST--------------------------------------------------------------------\n");
 				break;
 			case 6:
 				cont = 0;
@@ -640,6 +606,9 @@ int main() {
 		}
 		
 	} while (cont == 1);
+}
 
+int main() {
+	DisplayMenu();
 	return 1;
 }
