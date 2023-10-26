@@ -443,7 +443,6 @@ int DeleteMiddle(struct Node** start, int index){
 	}
 
 
-
 	if(index == 0) { //means the index given was 0, so delete front node
 		DeleteFront(start);
 		return 1;
@@ -459,6 +458,22 @@ int DeleteMiddle(struct Node** start, int index){
 	nodeBefore->next = nodeAfter;
 	free(nodeToDelete);
 	return 1;
+}
+
+//Traverse() functionality?
+//ref https://stackoverflow.com/questions/15098936/simple-way-to-check-if-a-string-contains-another-string-in-c
+void PrintSearch(struct Node** start, char* request) {
+	struct Node* current = *start;
+	char nodeString[256];
+
+	printf("Key | First Name, Last Name, Major, GPA\n");
+	while(current != NULL) {
+		ToString(current, nodeString);
+		if(strstr(nodeString, request) != NULL){
+			PrintNode(current);
+		}
+		current = current->next;
+	}
 }
 
 int main() {
@@ -605,11 +620,15 @@ int main() {
 
 			case 5:
 				//search engine for all fields basically, need ToString up and running first
-				currentStudent = LookUpByIndex(&_head, 0);
+				printf("\nEnter the string you would like to search.\n");
 
-				char currentStudentString[256];
-				ToCsv(currentStudent, currentStudentString);
-				printf("%s", currentStudentString);
+				char searchString[256];
+				printf("Your search request: ");
+				scanf("%s", searchString);
+
+				printf("\nYour search results: \n");
+
+				PrintSearch(&_head, searchString);
 				break;
 			case 6:
 				cont = 0;
