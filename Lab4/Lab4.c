@@ -468,7 +468,7 @@ void PrintSearch(struct Node** start, char* request) {
 
 	printf("Key | First Name, Last Name, Major, GPA\n");
 	while(current != NULL) {
-		ToString(current, nodeString);
+		ToCsv(current, nodeString);
 		if(strstr(nodeString, request) != NULL){
 			PrintNode(current);
 		}
