@@ -1,3 +1,7 @@
+//compilation command:
+//gcc -include=linkedlist.h -include=linkedlist.c Lab4.c
+
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
