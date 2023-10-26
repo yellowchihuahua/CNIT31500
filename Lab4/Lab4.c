@@ -4,7 +4,7 @@
 #include "linkedlist.h"
 void DisplayMenu(){
 
-	struct Node* _head = CreateList()->head;
+	struct LinkedList* list = CreateList();
 	int studentKeyCounter = 1;
 	
 	int cont = 1;
@@ -32,7 +32,7 @@ void DisplayMenu(){
 		switch(functionNumber){
 			case 1:
 				printf("\nHere is the list of all your students: ----------------------------------------\n");
-				PrintList(&_head);
+				PrintList(list);
 				printf("\nEND OF LIST--------------------------------------------------------------------\n");
 				break;
 
@@ -63,7 +63,7 @@ void DisplayMenu(){
 				scanf("%s", confirmation);
 				
 				if(strcmp(confirmation, "y") == 0){
-					int isSuccessful = InsertByGPA(&_head, currentStudent);
+					int isSuccessful = InsertByGPA(list, currentStudent);
 					if(isSuccessful){
 						printf("New node added!\n");
                         studentKeyCounter++;
@@ -84,7 +84,7 @@ void DisplayMenu(){
 				delStudentKey = atoi(delStudentKeyStr);
 
 				//validate if node exists with this key
-				currentStudent = LookUpByKey(&_head, delStudentKey);
+				currentStudent = LookUpByKey(list, delStudentKey);
 				if (currentStudent == NULL) {
 					printf("int main(); -- Student does not exist with key %d.\n", delStudentKey);
 					printf("No action has been performed.\n");
@@ -101,7 +101,7 @@ void DisplayMenu(){
 				scanf("%s", confirmation);
 				if(strcmp(confirmation, "y") == 0){
 					//do action, check for success
-					int isSuccessful = DeleteMiddle(&_head, GetIndexByKey(&_head, delStudentKey));
+					int isSuccessful = DeleteMiddle(list, GetIndexByKey(list, delStudentKey));
 					if (isSuccessful) {
 						printf("Node deleted!\n");
 						break;
@@ -122,7 +122,7 @@ void DisplayMenu(){
 				delStudentIndex = atoi(delStudentIndexStr);
 
 				//validate if node exists with this key
-				currentStudent = LookUpByIndex(&_head, delStudentIndex);
+				currentStudent = LookUpByIndex(list, delStudentIndex);
 				if (currentStudent == NULL) {
 					printf("int main(); -- Student does not exist with index %d.\n", delStudentIndex);
 					printf("No action has been performed.\n");
@@ -139,7 +139,7 @@ void DisplayMenu(){
 				scanf("%s", confirmation);
 				if(strcmp(confirmation, "y") == 0){
 					//do action, check for successs
-					int isSuccessful = DeleteMiddle(&_head, delStudentIndex);
+					int isSuccessful = DeleteMiddle(list, delStudentIndex);
 					if (isSuccessful){
 						printf("Node deleted!\n");
 						break;
@@ -159,12 +159,12 @@ void DisplayMenu(){
 
 				printf("Key: | Data: FirstName, LastName, Major, GPA\n");
 				printf("\nYour search results: ----------------------------------------------------------\n");
-				PrintSearch(&_head, searchString);
+				PrintSearch(list, searchString);
 				printf("\nEND OF LIST--------------------------------------------------------------------\n");
 				break;
 			case 6:
 				cont = 0;
-				FreeList(&_head);
+				FreeList(list);
 				break;
 			default:
 				printf("\nSorry, that is an invalid operation.\n");
