@@ -13,36 +13,32 @@ typedef struct Node {
 	struct Node* next;
 } Node; 
 
-typedef struct LinkedList{
-	Node* head;
-} LinkedList;
+//typedef struct LinkedList{
+//	Node* head;
+//} LinkedList;
 
 
 struct Node* CreateNode(int key, char *firstName, char *lastName, char *major, float GPA);
-struct LinkedList* CreateList();
-struct Node* LookUpByIndex(struct LinkedList* llist, int index);
-struct Node* LookUpByKey(struct LinkedList* llist, int key);
-int GetKeyByIndex(struct LinkedList* llist, int index);
-int GetIndexByKey(struct LinkedList* llist, int key);
-int GetListLength(struct LinkedList* llist);
+struct Node* LookUpByIndex(struct Node** start, int index);
+struct Node* LookUpByKey(struct Node** start, int key);
+int GetKeyByIndex(struct Node** start, int index);
+int GetIndexByKey(struct Node** start, int key);
+int GetListLength(struct Node** start);
 void ReverseString(char* str, int len);
 int IntToStr(int x, char str[], int d);
 int ftoa(float n, char* res, int afterpoint);
 int ToCsv(struct Node* node, char *string);
 int ToString(struct Node* node, char *string);
 void PrintNode(struct Node* node);
-void PrintList(struct LinkedList* llist);
-void PrintSearch(struct LinkedList* llist, char* searchRequest);
-void FreeList(struct LinkedList* llist);
-int InsertFront(struct LinkedList* llist, struct Node* nodeToInsert);
-int InsertEnd(struct LinkedList* llist, struct Node* nodeToInsert);
-int InsertMiddle(struct LinkedList* llist, int index, struct Node* nodeToInsert);
+void PrintList(struct Node** start);
+void PrintSearch(struct Node** start, char* searchRequest);
+void FreeList(struct Node** start);
+int InsertFront(struct Node** start, struct Node* nodeToInsert);
+int InsertEnd(struct Node** start, struct Node* nodeToInsert);
+int InsertMiddle(struct Node** start, int index, struct Node* nodeToInsert);
 int ToComparisonString(struct Node* node, char* string);
-int InsertByGPA(struct LinkedList* llist, struct Node* nodeToInsert);
-int DeleteFront(struct LinkedList* llist);
-int DeleteEnd(struct LinkedList* llist);
-int DeleteMiddle(struct LinkedList* llist, int index);
-
-
+int DeleteFront(struct Node** start);
+int DeleteEnd(struct Node** start);
+int DeleteMiddle(struct Node** start, int index);
 
 #endif

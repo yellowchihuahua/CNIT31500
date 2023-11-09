@@ -6,6 +6,48 @@
 #include <stdio.h>
 #include <string.h>
 #include "linkedlist.h"
+
+
+
+struct Stack{
+	Node* head;
+    Node* tail;
+} Stack;
+
+
+int PushLL(){
+    return 0;
+}
+
+int PushLL(){
+    return 0;
+}
+
+int SizeLL(){
+    return 0;
+}
+
+int EmptyLL(){
+    return 0;
+}
+
+int PushA(){
+    return 0;
+}
+
+int PopA(){
+    return 0;
+}
+
+int SizeA(){
+    return 0;
+}
+
+int EmptyA(){
+    return 0;
+}
+
+
 void DisplayMenu(){
 
 	struct LinkedList* list = CreateList();
