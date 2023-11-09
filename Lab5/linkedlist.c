@@ -23,10 +23,10 @@
 //};
 
 // *needs to be changed if struct Node changes (data received and processed)
-struct Node* CreateNode(int key, char *firstName, char *lastName, char *major, float GPA){
+struct Node* CreateNode(int key, char *firstName, char *lastName, char *puid, int age){
 	struct Node *newNode = (struct Node*)malloc(sizeof(struct Node));
 	if (newNode == NULL) {
-		printf("CreateNode(char *firstName, char *lastName, char *major, float GPA); -- Failed memory allocation.\n");
+		printf("CreateNode(char *firstName, char *lastName, char *puid, int age); -- Failed memory allocation.\n");
 		exit(1);
 	}
 
@@ -34,8 +34,8 @@ struct Node* CreateNode(int key, char *firstName, char *lastName, char *major, f
 
 	strcpy(newNode->firstName, firstName);
 	strcpy(newNode->lastName, lastName);
-	strcpy(newNode->major, major);
-	newNode->GPA = GPA;
+	strcpy(newNode->puid, puid);
+	newNode->age = age;
 	newNode->next = NULL;
 
 	return newNode;
@@ -188,7 +188,7 @@ int ToCsv(struct Node* node, char *string) {
 		return 0;
 	}
 
-	snprintf(string, 256, "%d, %s, %s, %s, %.2f\n", node->key, node->firstName, node->lastName, node->major, node->GPA);
+	snprintf(string, 256, "%d, %s, %s, %s, %d\n", node->key, node->firstName, node->lastName, node->puid, node->age);
 	return 1;
 }
 
@@ -204,7 +204,7 @@ int ToString(struct Node* node, char *string) {
 		printf("ToString(char *string, struct Node* node); -- Node is null, nothing to convert.\n");
 		return 0;
 	}
-	snprintf(string, 256, "Key: %d | Data: %s, %s, %s, %.2f\n", node->key, node->firstName, node->lastName, node->major, node->GPA);
+	snprintf(string, 256, "Key: %d | Data: %s, %s, %s, %d\n", node->key, node->firstName, node->lastName, node->puid, node->age);
 	return 1;
 }
 
@@ -327,13 +327,10 @@ int ToComparisonString(struct Node* node, char* string){
 		return 0;
 	}
 
-	//to string and inverting gpa to maintain descending order
-	char gpaStr[10];
-	ftoa((5.0f-node->GPA), gpaStr, 2);
 
 	//ORDER OF COMPARISON:
 	//inverted gpa, last name, first name, major
-	snprintf(string, 256, "%.2f%s%s%s\n", gpaStr, node->lastName, node->firstName, node->major);
+	snprintf(string, 256, "%d%s%s%s\n", node->puid, node->lastName, node->firstName, node->age);
 	return 1;
 }
 

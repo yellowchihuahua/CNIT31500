@@ -1,34 +1,59 @@
 //compilation command:
-//gcc -include=linkedlist.h -include=linkedlist.c Lab4.c
+//gcc Lab5.c -o 1.exe -include linkedlist.h -include linkedlist.c
 
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
 #include "linkedlist.h"
-
 
 
 struct Stack{
 	Node* head;
-    Node* tail;
 } Stack;
 
+struct Stack* CreateStack(){
+	struct Stack* stack = malloc(sizeof(struct Stack));
+	if (stack == NULL) {
+		printf("CreateStack(); -- Failed memory allocation.\n");
+		return NULL;
+	}
+	stack->head = NULL;
+	return stack;
+}
 
-int PushLL(){
+
+int PushLL(struct Stack* stack, struct Node* nodeToInsert, char* type){ //dunno what to do with type yet
+	InsertFront(&(stack->head), nodeToInsert);
     return 0;
 }
 
-int PushLL(){
-    return 0;
+struct Node* PopLL(struct Stack* stack){
+	if (GetListLength(&(stack->head)) == 0) {
+		printf("PopLL(struct Stack* start); -- Empty stack, nothing to pop.\n");
+		return NULL;
+	}
+
+		struct Node* current = stack->head;
+	if (current->next == NULL) { //free head if head is only item
+		FreeList(&current);
+	}
+	while (current->next->next != NULL) {
+		current = current->next;
+	}
+	struct Node* temp = current->next;
+	//free(current->next);
+	current->next = NULL; //unlink but don't free
+	return temp;
 }
 
-int SizeLL(){
-    return 0;
+int SizeLL(struct Stack* stack){
+	return GetListLength(&(stack->head));
 }
 
-int EmptyLL(){
-    return 0;
+void EmptyLL(struct Stack* stack){
+    FreeList(&(stack->head));
 }
 
 int PushA(){
@@ -48,9 +73,10 @@ int EmptyA(){
 }
 
 
+//array: https://www.digitalocean.com/community/tutorials/stack-in-c
 void DisplayMenu(){
 
-	struct LinkedList* list = CreateList();
+	struct Node* _head = CreateStack()->head;
 	int studentKeyCounter = 1;
 	
 	int cont = 1;
@@ -78,7 +104,7 @@ void DisplayMenu(){
 		switch(functionNumber){
 			case 1:
 				printf("\nHere is the list of all your students: ----------------------------------------\n");
-				PrintList(list);
+				PrintList(&_head);
 				printf("\nEND OF LIST--------------------------------------------------------------------\n");
 				break;
 
@@ -87,7 +113,7 @@ void DisplayMenu(){
 				printf("\nEnter the information of the student you would like to add.\n");
 
 				char newStudentFirstName[64], newStudentLastName[64], newStudentMajor[64];
-				float newStudentGPA;
+				char newStudentGPA;
 				char newStudentGPAStr[8];
 				printf("Type your inputs and press enter:\n");
 				printf("New student's First Name: ");
@@ -109,7 +135,7 @@ void DisplayMenu(){
 				scanf("%s", confirmation);
 				
 				if(strcmp(confirmation, "y") == 0){
-					int isSuccessful = InsertByGPA(list, currentStudent);
+					int isSuccessful = true;
 					if(isSuccessful){
 						printf("New node added!\n");
                         studentKeyCounter++;
@@ -130,7 +156,7 @@ void DisplayMenu(){
 				delStudentKey = atoi(delStudentKeyStr);
 
 				//validate if node exists with this key
-				currentStudent = LookUpByKey(list, delStudentKey);
+				currentStudent = LookUpByKey(&_head, delStudentKey);
 				if (currentStudent == NULL) {
 					printf("int main(); -- Student does not exist with key %d.\n", delStudentKey);
 					printf("No action has been performed.\n");
@@ -147,7 +173,7 @@ void DisplayMenu(){
 				scanf("%s", confirmation);
 				if(strcmp(confirmation, "y") == 0){
 					//do action, check for success
-					int isSuccessful = DeleteMiddle(list, GetIndexByKey(list, delStudentKey));
+					int isSuccessful = DeleteMiddle(&_head, GetIndexByKey(&_head, delStudentKey));
 					if (isSuccessful) {
 						printf("Node deleted!\n");
 						break;
@@ -168,7 +194,7 @@ void DisplayMenu(){
 				delStudentIndex = atoi(delStudentIndexStr);
 
 				//validate if node exists with this key
-				currentStudent = LookUpByIndex(list, delStudentIndex);
+				currentStudent = LookUpByIndex(&_head, delStudentIndex);
 				if (currentStudent == NULL) {
 					printf("int main(); -- Student does not exist with index %d.\n", delStudentIndex);
 					printf("No action has been performed.\n");
@@ -185,7 +211,7 @@ void DisplayMenu(){
 				scanf("%s", confirmation);
 				if(strcmp(confirmation, "y") == 0){
 					//do action, check for successs
-					int isSuccessful = DeleteMiddle(list, delStudentIndex);
+					int isSuccessful = DeleteMiddle(&_head, delStudentIndex);
 					if (isSuccessful){
 						printf("Node deleted!\n");
 						break;
@@ -205,12 +231,12 @@ void DisplayMenu(){
 
 				printf("Key: | Data: FirstName, LastName, Major, GPA\n");
 				printf("\nYour search results: ----------------------------------------------------------\n");
-				PrintSearch(list, searchString);
+				PrintSearch(&_head, searchString);
 				printf("\nEND OF LIST--------------------------------------------------------------------\n");
 				break;
 			case 6:
 				cont = 0;
-				FreeList(list);
+				FreeList(&_head);
 				break;
 			default:
 				printf("\nSorry, that is an invalid operation.\n");

@@ -7,8 +7,8 @@ typedef struct Node {
 	int key;
 	char firstName[64];
 	char lastName[64];
-	char major[64];
-	float GPA;
+	char puid[64];
+	int age;
 
 	struct Node* next;
 } Node; 
@@ -18,7 +18,7 @@ typedef struct Node {
 //} LinkedList;
 
 
-struct Node* CreateNode(int key, char *firstName, char *lastName, char *major, float GPA);
+struct Node* CreateNode(int key, char *firstName, char *lastName, char *puid, int age);
 struct Node* LookUpByIndex(struct Node** start, int index);
 struct Node* LookUpByKey(struct Node** start, int key);
 int GetKeyByIndex(struct Node** start, int index);
