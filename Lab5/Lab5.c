@@ -15,6 +15,11 @@ struct Stack
 	Node* head;
 } Stack;
 
+struct Queue {
+	Node* head;
+} Queue;
+
+//stack methods
 struct Stack* CreateStack()
 {
 	struct Stack *stack = malloc(sizeof(struct Stack));
@@ -27,13 +32,15 @@ struct Stack* CreateStack()
 	return stack;
 }
 
-void PushLL(struct Stack *stack, struct Node *nodeToInsert)
+//put at front
+void PushLL(struct Stack* stack, struct Node* nodeToInsert)
 { 
 	struct Node** top = &(stack->head);
 	InsertFront(top, nodeToInsert);
 }
 
-struct Node* PopLL(struct Stack*stack)
+//pop from front
+struct Node* PopLL(struct Stack* stack)
 {
 	if (GetListLength(&(stack->head)) == 0)
 	{
@@ -47,13 +54,13 @@ struct Node* PopLL(struct Stack*stack)
 	return temp;
 }
 
-int SizeLL(struct Stack *stack)
+int SizeLL(struct Stack* stack)
 {
 	struct Node *current = stack->head;
 	return GetListLength(&current);
 }
 
-void EmptyLL(struct Stack *stack)
+void EmptyLL(struct Stack* stack)
 {
 	FreeList(&(stack->head));
 }
@@ -68,6 +75,59 @@ int PopA()
 	return 0;
 }
 
+//queue methods
+struct Queue* CreateQueue()
+{
+	struct Queue *queue = malloc(sizeof(struct Queue));
+	if (queue == NULL)
+	{
+		printf("CreateQueue(); -- Failed memory allocation.\n");
+		return NULL;
+	}
+	queue->head = NULL;
+	return queue;
+}
+
+//put at end 
+void EnqueueLL(struct Queue* queue, struct Node* nodeToInsert){
+	struct Node** top = &(queue->head);
+	InsertEnd(top, nodeToInsert);
+}
+
+//take from head
+struct Node* DequeueLL(struct Queue* queue){
+	if (GetListLength(&(queue->head)) == 0)
+	{
+		printf("DequeueLL(struct Queue* queue); -- Empty queue, nothing to dequeue.\n");
+		return NULL;
+	}
+
+	//return head, make new head
+	struct Node* temp = queue->head;
+	queue->head = queue->head->next;
+	return temp;
+}
+
+void EnqueueA(){
+
+}
+
+void DequeueA(){
+
+}
+
+//generic size and free methods for both stack and queue
+int SizeLL(struct Node** start)
+{
+	//struct Node *current = stack->head;
+	return GetListLength(start);
+}
+
+void EmptyLL(struct Node** start)
+{
+	FreeList(start);
+}
+
 int SizeA()
 {
 	return 0;
@@ -78,7 +138,9 @@ int EmptyA()
 	return 0;
 }
 
-// need to assign a key after output from this node
+
+
+// param int *studentKeyCounter: need to assign a key after output from this node
 struct Node *CreateNodeFromUserInput(int *studentKeyCounter) // will use the count
 {
 	struct Node *currentNode = NULL;
@@ -105,8 +167,8 @@ struct Node *CreateNodeFromUserInput(int *studentKeyCounter) // will use the cou
 // array: https://www.digitalocean.com/community/tutorials/stack-in-c
 void DisplayMenu()
 {
-
 	struct Stack *_stack = CreateStack();
+	struct Queue *_queue = CreateQueue();
 	int studentKeyCounter = 1; // this key is used to identify every created node as unique. auto increments
 
 	struct Node *_currentNode = NULL;
@@ -177,7 +239,7 @@ void DisplayMenu()
 			// if no exist: create a node and add to top of stack
 			printf("A current node does not exist. Please enter your inputs to create and push a new node to stack.\n");
 			_currentNode = CreateNodeFromUserInput(&studentKeyCounter);
-			printf("Node aded to stack: ");
+			printf("Node added to stack: ");
 			PrintNode(_currentNode);
 			PushLL(_stack, _currentNode);
 			_currentNode = NULL;
@@ -196,14 +258,34 @@ void DisplayMenu()
 			break;
 
 		case 4: // enqueue to queue
-			// check if current node exists
-			// if exists: add to back of queue
-			//  if no exist: create a node and add to back of queue
+			printf("\n");
+			// check if the current node exists
+			if (_currentNode != NULL)
+			{ // if exists: add to top of stack
+				printf("Pushing current node to back of queue.\n");
+				EnqueueLL(_queue, _currentNode);
+				_currentNode = NULL;
+				break;
+			}
+			// if no currentNode exist: create a node and add to top of stack
+			printf("A current node does not exist. Please enter your inputs to create and push a new node to stack.\n");
+			_currentNode = CreateNodeFromUserInput(&studentKeyCounter);
+			printf("Node added to queue: ");
+			PrintNode(_currentNode);
+			EnqueueLL(_queue, _currentNode);
+			_currentNode = NULL;
 			break;
 
-		case 5: // dequeue from queue
-			// remove dequeued node from queue, unlink
-			// make dequeued node the current node
+		case 5: // dequeue from queue, make dequeued node the 'current' node
+
+			// if current node exists, warn about overwriting
+			printf("\n");
+			if (_currentNode != NULL)
+			{
+				printf("A current node already exists. It WILL be overwritten with your dequeued item.\n");
+			}
+			printf("Node dequeued and assigned to current node");
+			_currentNode = DequeueLL(_queue);
 			break;
 
 		case 6: // add node to both stack and queue
@@ -218,9 +300,15 @@ void DisplayMenu()
 			break;
 
 		case 8: // empty stack
+			printf("\n");
+			EmptyLL(&(_stack->head));
+			printf("Stack emptied!\n");
 			break;
 
 		case 9: // empty queue
+			printf("\n");
+			EmptyLL(&(_queue->head));
+			printf("Queue emptied!\n");
 			break;
 
 		case 10: // print stack
@@ -231,6 +319,10 @@ void DisplayMenu()
 			break;
 
 		case 11: // print queue
+			printf("\n");
+			printf("Your current queue: ----------------------------------------------------\n");
+			PrintList(&(_queue->head));
+			printf("------------------------------------------------------------------------\n");
 			break;
 
 		case 12: // print number of moves so far
