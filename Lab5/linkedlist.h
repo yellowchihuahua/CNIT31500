@@ -4,7 +4,6 @@
 //ref https://github.com/skorks/c-linked-list/blob/master/linkedlist.h for structure
 //ref https://stackoverflow.com/questions/26439354/error-incomplete-type-is-not-allowed
 typedef struct Node {
-	int key;
 	char firstName[64];
 	char lastName[64];
 	char puid[64];
@@ -18,11 +17,8 @@ typedef struct Node {
 //} LinkedList;
 
 
-struct Node* CreateNode(int key, char *firstName, char *lastName, char *puid, int age);
+struct Node* CreateNode(char *firstName, char *lastName, char *puid, int age);
 struct Node* LookUpByIndex(struct Node** start, int index);
-struct Node* LookUpByKey(struct Node** start, int key);
-int GetKeyByIndex(struct Node** start, int index);
-int GetIndexByKey(struct Node** start, int key);
 int GetListLength(struct Node** start);
 void ReverseString(char* str, int len);
 int IntToStr(int x, char str[], int d);

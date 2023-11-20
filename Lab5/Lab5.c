@@ -10,17 +10,26 @@
 #include <stdbool.h>
 #include "linkedlist.h"
 
+int movesStackLL, movesQueueLL, movesStackA, movesQueueA = 0;
+
+struct Node _stackA[100]; //stack of 100 nodes, global scope
+int _stackATop = -1;
+
+struct Node _queueA[100]; //queue of 100 nodes max, global scope
+//last is where to pull from
+int _queueALast = -1;
+
 struct Stack
 {
 	Node* head;
 } Stack;
 
 //ref https://www.geeksforgeeks.org/introduction-to-stack-data-structure-and-algorithm-tutorials/#
-struct StackA {
-	int top;
-	unsigned capacity;
-	Node** array;
-} StackA;
+//struct StackA {
+//	int top;
+//	unsigned capacity;
+//	Node** array;
+//} StackA;
 
 struct Queue {
 	Node* head;
@@ -36,6 +45,7 @@ struct Stack* CreateStack()
 		return NULL;
 	}
 	stack->head = NULL;
+	movesStackLL++;
 	return stack;
 }
 
@@ -44,11 +54,13 @@ void PushLL(struct Stack* stack, struct Node* nodeToInsert)
 { 
 	struct Node** top = &(stack->head);
 	InsertFront(top, nodeToInsert);
+	movesStackLL++;
 }
 
 //pop from front
 struct Node* PopLL(struct Stack* stack)
 {
+	movesStackLL++; //get list length traversal
 	if (GetListLength(&(stack->head)) == 0)
 	{
 		printf("PopLL(struct Stack* start); -- Empty stack, nothing to pop.\n");
@@ -58,42 +70,59 @@ struct Node* PopLL(struct Stack* stack)
 	//return head, make new head
 	struct Node* temp = stack->head;
 	stack->head = stack->head->next;
+	movesStackLL++;
 	return temp;
 }
 
-struct StackA* CreateStackA(unsigned capacity) 
-{ 
-    struct StackA* stack = (struct StackA*)malloc(sizeof(struct StackA)); 
-    stack->capacity = capacity; 
-    stack->top = -1; 
-    stack->array = (Node**)malloc(stack->capacity * sizeof(struct Node)); 
-    return stack; 
-} 
+// struct StackA* CreateStackA(unsigned capacity) 
+// { 
+//     struct StackA* stack = (struct StackA*)malloc(sizeof(struct StackA)); 
+//     stack->capacity = capacity; 
+//     stack->top = -1; 
+//     stack->array = (Node**)malloc(stack->capacity * sizeof(struct Node)); 
+//     return stack; 
+// } 
 
-int StackAIsFull(struct StackA* stack){
-	return stack->top == stack->capacity - 1; 
+int StackAIsFull(){
+	int arrSize = sizeof(_stackA) / sizeof(_stackA[0]);
+	return _stackATop == arrSize - 1; 
 }
 
-int StackAIsEmpty(struct StackA* stack) 
+int StackAIsEmpty() 
 { 
-    return stack->top == -1; 
+    return _stackATop == -1; 
 } 
 
-void PushA(struct StackA* stack, struct Node* nodeToInsert)
+void PushA(struct Node nodeToInsert)
 {
-	if (StackAIsFull(stack)) 
-		printf("PushA(struct StackA* stack, struct Node* nodeToInsert); - Stack (array) is full, unable to push");
+	if (StackAIsFull()) {
+		printf("PushA(struct Node nodeToInsert); - Stack (array) is full, unable to push");
     	return; 
-    stack->array[++stack->top] = nodeToInsert; 
-	PrintNode(nodeToInsert);
+	}
+	_stackATop = _stackATop + 1;
+    (_stackA[_stackATop]) = nodeToInsert; 
+	PrintNode(&nodeToInsert);
     printf(" pushed to stack\n");
 }
 
-struct Node* PopA(struct StackA* stack)
+struct Node PopA() 
 {
-	if (StackAIsEmpty(stack)) 
-        return NULL; 
-    return stack->array[stack->top--]; 
+	if (StackAIsEmpty()) {
+        return _stackA[0]; 
+	}
+	Node temp = _stackA[_stackATop];
+
+	movesStackA++;
+	//reset values
+	strcpy(_stackA[_stackATop].firstName, ""); 
+	strcpy(_stackA[_stackATop].lastName, ""); 
+	strcpy(_stackA[_stackATop].puid, ""); 
+	_stackA[_stackATop].age = 0;
+
+	//minus index of top
+	_stackATop = _stackATop - 1;
+
+    return temp;
 }
 
 //queue methods
@@ -106,13 +135,16 @@ struct Queue* CreateQueue()
 		return NULL;
 	}
 	queue->head = NULL;
+	movesQueueLL++;
 	return queue;
 }
 
 //put at end 
 void EnqueueLL(struct Queue* queue, struct Node* nodeToInsert){
 	struct Node** top = &(queue->head);
+	movesQueueLL++;//traversal
 	InsertEnd(top, nodeToInsert);
+	movesQueueLL++;//insertion
 }
 
 //take from head
@@ -126,15 +158,58 @@ struct Node* DequeueLL(struct Queue* queue){
 	//return head, make new head
 	struct Node* temp = queue->head;
 	queue->head = queue->head->next;
+	movesQueueLL++;
 	return temp;
 }
 
-void EnqueueA(){
-
+int QueueAIsFull(){
+	int arrSize = sizeof(_queueA) / sizeof(_queueA[0]);
+	return _queueALast == arrSize - 1; 
 }
 
-void DequeueA(){
+int QueueAIsEmpty() 
+{
+    return _queueALast == -1; 
+} 
 
+void EnqueueA(struct Node nodeToInsert){
+	if (QueueAIsFull()) {
+		printf("EnqueueA(struct Node nodeToInsert); - Queue (array) is full, unable to push");
+    	return; 
+	}
+	movesQueueA++;
+	_queueALast = _queueALast+1;
+	_queueA[_queueALast] = nodeToInsert;
+	PrintNode(&nodeToInsert);
+	printf(" pushed to stack\n");
+}
+
+
+struct Node DequeueA(){
+	if (QueueAIsEmpty()) {
+        return _queueA[0]; //not nullable so returning this
+	}
+	//pull from beginning
+	Node temp = _queueA[0];
+
+	//clear first element first to ensure edge case of dequeueing the last remaining element
+	movesQueueA++;
+	strcpy(_queueA[0].firstName, ""); 
+	strcpy(_queueA[0].lastName, ""); 
+	strcpy(_queueA[0].puid, ""); 
+	_queueA[0].age = 0;
+
+	//shift all nodes to beginning to have next in queue at beginning
+    int size = sizeof(_queueA) / sizeof(_queueA[0]);
+    for (int i = 0; i < size; i++) {
+		_queueA[i] = _queueA[i+1];
+		movesQueueA++;
+    }
+
+	//minus index of last
+	_queueALast = _queueALast - 1;
+
+    return temp;
 }
 
 //generic size and free methods for both stack and queue
@@ -149,32 +224,63 @@ void EmptyLL(struct Node** start)
 	FreeList(start);
 }
 
-int SizeA()
-{
-	return 0;
+void EmptyStackA(){
+	int size = sizeof(_stackA) / sizeof(_stackA[0]);
+	for (int i = 0; i < size; i++) {
+		strcpy(_stackA[i].firstName, ""); 
+		strcpy(_stackA[i].lastName, ""); 
+		strcpy(_stackA[i].puid, ""); 
+		_stackA[i].age = 0;
+	}
 }
 
-int EmptyA()
-{
-	return 0;
+void EmptyQueueA(){
+	int size = sizeof(_queueA) / sizeof(_queueA[0]);
+
+	for (int i = 0; i < size; i++){
+		strcpy(_queueA[i].firstName, ""); 
+		strcpy(_queueA[i].lastName, ""); 
+		strcpy(_queueA[i].puid, ""); 
+		_queueA[i].age = 0;
+	}
 }
 
-void PrintArray(Node** arr) {
+int SizeStackA()
+{
+	return sizeof(_stackA) / sizeof(_stackA[0]);
+}
+
+int SizeQueueA(){
+	return sizeof(_queueA) / sizeof(_queueA[0]);
+}
+
+void PrintStackArray() {
     // Calculate the size of the array
-    int size = sizeof(arr) / sizeof(arr[0]);
+    int size =  _stackATop +2;//sizeof(_stackA) / sizeof(_stackA[0]);
 
     // Print the elements of the array
     for (int i = 0; i < size; i++) {
-        PrintNode(arr[i]);
+		printf("Printing\n");
+        PrintNode(&(_stackA[i]));
+    }
+    printf("\n");
+}
+
+void PrintQueueArray() {
+    // Calculate the size of the array
+    int size = _queueALast +2;//sizeof(_queueA) / sizeof(_queueA[0]);
+
+    // Print the elements of the array
+    for (int i = 0; i < size; i++) {
+		printf("Printing\n");
+        PrintNode(&(_queueA[i]));
     }
     printf("\n");
 }
 
 
 
-
-// param int *studentKeyCounter: need to assign a key after output from this node
-struct Node *CreateNodeFromUserInput(int *studentKeyCounter) // will use the count
+struct Node *CreateNodeFromUserInput() // will use the count
 {
 	struct Node *currentNode = NULL;
 
@@ -192,8 +298,7 @@ struct Node *CreateNodeFromUserInput(int *studentKeyCounter) // will use the cou
 	scanf("%s", &newStudentAgeStr);
 	newStudentAge = atof(newStudentAgeStr);
 
-	currentNode = CreateNode(*studentKeyCounter, newStudentFirstName, newStudentLastName, newStudentPuid, newStudentAge);
-	(*studentKeyCounter)++;
+	currentNode = CreateNode(newStudentFirstName, newStudentLastName, newStudentPuid, newStudentAge);
 	return currentNode;
 }
 
@@ -201,9 +306,7 @@ struct Node *CreateNodeFromUserInput(int *studentKeyCounter) // will use the cou
 void DisplayMenu()
 {
 	struct Stack *_stack = CreateStack();
-	struct StackA *_stackA = CreateStackA(20);
 	struct Queue *_queue = CreateQueue();
-	int studentKeyCounter = 1; // this key is used to identify every created node as unique. auto increments
 
 	struct Node *_currentNode = NULL;
 	int cont = 1;
@@ -235,7 +338,7 @@ void DisplayMenu()
 		PrintNode(_currentNode);
 		printf("------------------------------------------------------------------------\n");
 
-		printf("Enter the number you would like to use (0-12): ");
+		printf("Enter the number you would like to use (1-13): ");
 		scanf("%s", input); // receiving as string then converting to int validates value
 		functionNumber = atoi(input);
 		userInputCounter++;
@@ -255,7 +358,7 @@ void DisplayMenu()
 				free(_currentNode);
 			}
 
-			_currentNode = CreateNodeFromUserInput(&studentKeyCounter);
+			_currentNode = CreateNodeFromUserInput();
 			printf("Current node set to: ");
 			PrintNode(_currentNode);
 			break;
@@ -267,17 +370,17 @@ void DisplayMenu()
 			{ // if exists: add to top of stack
 				printf("Pushing current node to top of stack.\n");
 				PushLL(_stack, _currentNode);
-				PushA(_stackA, _currentNode);
+				PushA(*_currentNode);
 				_currentNode = NULL;
 				break;
 			}
 			// if no exist: create a node and add to top of stack
 			printf("A current node does not exist. Please enter your inputs to create and push a new node to stack.\n");
-			_currentNode = CreateNodeFromUserInput(&studentKeyCounter);
+			_currentNode = CreateNodeFromUserInput();
 			printf("Node added to stack: ");
 			PrintNode(_currentNode);
 			PushLL(_stack, _currentNode);
-			PushA(_stackA, _currentNode);
+			PushA(*_currentNode);
 			_currentNode = NULL;
 			break;
 
@@ -287,11 +390,17 @@ void DisplayMenu()
 			if (_currentNode != NULL)
 			{
 				printf("A current node already exists. It WILL be overwritten with your popped item.\n");
-				//_currentNode = PopLL(_stack);
+				_currentNode = PopLL(_stack);
 			}
 			printf("Node popped and assigned to current node");
+
+			printf("From LL: ");
 			_currentNode = PopLL(_stack);
-			_currentNode = PopA(_stackA);
+			PrintNode(_currentNode);
+
+			printf("From array: ");
+			*_currentNode = PopA();
+			PrintNode(_currentNode);
 			break;
 
 		case 4: // enqueue to queue
@@ -301,15 +410,17 @@ void DisplayMenu()
 			{ // if exists: add to top of stack
 				printf("Pushing current node to back of queue.\n");
 				EnqueueLL(_queue, _currentNode);
+				EnqueueA(*_currentNode);
 				_currentNode = NULL;
 				break;
 			}
 			// if no currentNode exist: create a node and add to top of stack
 			printf("A current node does not exist. Please enter your inputs to create and push a new node to stack.\n");
-			_currentNode = CreateNodeFromUserInput(&studentKeyCounter);
+			_currentNode = CreateNodeFromUserInput();
 			printf("Node added to queue: ");
 			PrintNode(_currentNode);
 			EnqueueLL(_queue, _currentNode);
+			EnqueueA(*_currentNode);
 			_currentNode = NULL;
 			break;
 
@@ -323,29 +434,72 @@ void DisplayMenu()
 			}
 			printf("Node dequeued and assigned to current node");
 			_currentNode = DequeueLL(_queue);
+			printf("From LL: ");
+			PrintNode(_currentNode);
+
+			*_currentNode = DequeueA();
+			printf("From Array: ");
+			PrintNode(_currentNode);
 			break;
 
 		case 6: // add node to both stack and queue
+			printf("\n");
+			// check if the current node exists
+			if (_currentNode != NULL)
+			{ // if exists: add to top of stack
+				printf("Pushing current node to top of stack.\n");
+				printf("Pushing current node to back of queue.\n");
+				PushLL(_stack, _currentNode);
+				PushA(*_currentNode);
+				EnqueueLL(_queue, _currentNode);
+				EnqueueA(*_currentNode);
+
+				_currentNode = NULL;
+				break;
+			}
+			// if no currentNode exist: create a node and add to top of stack
+			printf("A current node does not exist. Please enter your inputs to create and push a new node to stack.\n");
+			_currentNode = CreateNodeFromUserInput();
+			printf("Node added to stack: \n");
+			printf("Node added to queue: \n");
+			PrintNode(_currentNode);
+			PushLL(_stack, _currentNode);
+			PushA(*_currentNode);
+			EnqueueLL(_queue, _currentNode);
+			EnqueueA(*_currentNode);
+			_currentNode = NULL;
 
 			break;
 
 		case 7: // remove node from both stack and queue
-			// if node exists in each
-			// remove node from each
-			// remove node from just one if it only exists in one
-			// set node as current
+			printf("\n");
+			if (_currentNode != NULL)
+			{
+				printf("A current node already exists. It WILL be overwritten with your dequeued item.\n");
+			}
+			printf("Node removed from stack");
+			printf("Node dequeued and assigned to current node");
+
+			*_currentNode = PopA();
+			*_currentNode = DequeueA();
+			_currentNode = PopLL(_stack);
+			_currentNode = DequeueLL(_queue);
+
+			PrintNode(_currentNode);
 			break;
 
 		case 8: // empty stack
 			printf("\n");
 			EmptyLL(&(_stack->head));
-			printf("Stack emptied!\n");
+			EmptyStackA();
+			printf("Stacks emptied!\n");
 			break;
 
 		case 9: // empty queue
 			printf("\n");
 			EmptyLL(&(_queue->head));
-			printf("Queue emptied!\n");
+			EmptyQueueA();
+			printf("Queues emptied!\n");
 			break;
 
 		case 10: // print stack
@@ -354,8 +508,8 @@ void DisplayMenu()
 			PrintList(&(_stack->head));
 			printf("------------------------------------------------------------------------\n");
 
-			printf("Your current stack (array): ----------------------------------------------------\n");
-			PrintArray(_stackA->array);
+			printf("Your current stack (array): --------------------------------------------\n");
+			PrintStackArray();
 			printf("------------------------------------------------------------------------\n");
 			break;
 
@@ -363,6 +517,10 @@ void DisplayMenu()
 			printf("\n");
 			printf("Your current queue: ----------------------------------------------------\n");
 			PrintList(&(_queue->head));
+			printf("------------------------------------------------------------------------\n");
+
+			printf("Your current queue (array): --------------------------------------------\n");
+			PrintQueueArray();
 			printf("------------------------------------------------------------------------\n");
 
 			break;
@@ -373,154 +531,14 @@ void DisplayMenu()
 
 		case 13: // exit the program
 			cont = 0;
-			// FreeList(&_head);
+			FreeList(&_stack->head);
+			FreeList(&_queue->head);
 			// free all the shit
 			break;
 		default:
 			printf("\nSorry, that is an invalid operation.\n");
 			userInputCounter--;
 		}
-
-		// switch(functionNumber){
-		// 	case 1:
-		// 		printf("\nHere is the list of all your students: ----------------------------------------\n");
-		// 		PrintList(&_head);
-		// 		printf("\nEND OF LIST--------------------------------------------------------------------\n");
-		// 		break;
-
-		// 	case 2:
-		// 		//insert a student to linked list
-		// 		printf("\nEnter the information of the student you would like to add.\n");
-
-		// 		char newStudentFirstName[64], newStudentLastName[64], newStudentMajor[64];
-		// 		char newStudentGPA;
-		// 		char newStudentGPAStr[8];
-		// 		printf("Type your inputs and press enter:\n");
-		// 		printf("New student's First Name: ");
-		//         scanf("%s", newStudentFirstName);
-		//         printf("New student's Last Name: ");
-		//         scanf("%s", newStudentLastName);
-		//         printf("New student's Major: ");
-		//         scanf("%s", newStudentMajor);
-		//         printf("New student's GPA: ");
-		//         scanf("%s", &newStudentGPAStr);
-		// 		newStudentGPA = atof(newStudentGPAStr);
-
-		// 		struct Node* currentStudent = CreateNode(studentKeyCounter, newStudentFirstName, newStudentLastName, newStudentMajor, newStudentGPA);
-		// 		printf("Node to add: ");
-		// 		PrintNode(currentStudent);
-
-		// 		char confirmation[1] = "n";
-		// 		printf("Enter y to confirm this is correct, any other key to deny: ");
-		// 		scanf("%s", confirmation);
-
-		// 		if(strcmp(confirmation, "y") == 0){
-		// 			int isSuccessful = true;
-		// 			if(isSuccessful){
-		// 				printf("New node added!\n");
-		//                 studentKeyCounter++;
-		// 				break;
-		// 			}
-		// 		}
-		// 		printf("Add node action cancelled.\n");
-		// 		break;
-
-		// 	case 3:
-		// 		//delete a student from linked list by key
-		// 		printf("\nEnter the key of the student you would like to delete.\n");
-
-		// 		int delStudentKey;
-		// 		char delStudentKeyStr[64];
-		// 		printf("Student key: ");
-		//         scanf("%s", delStudentKeyStr);
-		// 		delStudentKey = atoi(delStudentKeyStr);
-
-		// 		//validate if node exists with this key
-		// 		currentStudent = LookUpByKey(&_head, delStudentKey);
-		// 		if (currentStudent == NULL) {
-		// 			printf("int main(); -- Student does not exist with key %d.\n", delStudentKey);
-		// 			printf("No action has been performed.\n");
-		// 			break;
-		// 		}
-
-		// 		//print node before confirming
-		// 		printf("Student to delete: \n");
-		// 		PrintNode(currentStudent);
-
-		// 		//confirm action
-		// 		confirmation[0]='n';
-		// 		printf("Enter y to confirm this is correct, any other key to deny: ");
-		// 		scanf("%s", confirmation);
-		// 		if(strcmp(confirmation, "y") == 0){
-		// 			//do action, check for success
-		// 			int isSuccessful = DeleteMiddle(&_head, GetIndexByKey(&_head, delStudentKey));
-		// 			if (isSuccessful) {
-		// 				printf("Node deleted!\n");
-		// 				break;
-		// 			}
-		// 		}
-		// 		printf("Delete node by key action cancelled.\n");
-		// 		break;
-
-		// 	case 4:
-		// 		//delete student from ll by index
-		// 		printf("\nEnter the index of the student you would like to delete.\n");
-		// 		printf("Reminder: indices start from 0.\n");
-
-		// 		int delStudentIndex;
-		// 		char delStudentIndexStr[64];
-		// 		printf("Student index: ");
-		//         scanf("%s", delStudentIndexStr);
-		// 		delStudentIndex = atoi(delStudentIndexStr);
-
-		// 		//validate if node exists with this key
-		// 		currentStudent = LookUpByIndex(&_head, delStudentIndex);
-		// 		if (currentStudent == NULL) {
-		// 			printf("int main(); -- Student does not exist with index %d.\n", delStudentIndex);
-		// 			printf("No action has been performed.\n");
-		// 			break;
-		// 		}
-
-		// 		//print node before confirming
-		// 		printf("Student to delete: \n");
-		// 		PrintNode(currentStudent);
-
-		// 		//confirm action
-		// 		confirmation[0]='n';
-		// 		printf("Enter y to confirm this is correct, any other key to deny: ");
-		// 		scanf("%s", confirmation);
-		// 		if(strcmp(confirmation, "y") == 0){
-		// 			//do action, check for successs
-		// 			int isSuccessful = DeleteMiddle(&_head, delStudentIndex);
-		// 			if (isSuccessful){
-		// 				printf("Node deleted!\n");
-		// 				break;
-		// 			}
-		// 		}
-		// 		printf("Delete node by index action cancelled.\n");
-		// 		break;
-
-		// 	case 5:
-		// 		//search engine for all fields basically, need ToString up and running first
-		// 		printf("\nEnter the string you would like to search.\n");
-
-		// 		char searchString[256];
-		// 		printf("Your search request: ");
-		// 		scanf("%s", searchString);
-
-		// 		printf("Key: | Data: FirstName, LastName, Major, GPA\n");
-		// 		printf("\nYour search results: ----------------------------------------------------------\n");
-		// 		PrintSearch(&_head, searchString);
-		// 		printf("\nEND OF LIST--------------------------------------------------------------------\n");
-		// 		break;
-		// 	case 6:
-		// 		cont = 0;
-		// 		FreeList(&_head);
-		// 		break;
-		// 	default:
-		// 		printf("\nSorry, that is an invalid operation.\n");
-		// 		userInputCounter--;
-		// }
 
 	} while (cont == 1);
 }
