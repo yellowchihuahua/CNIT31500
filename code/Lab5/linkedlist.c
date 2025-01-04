@@ -23,14 +23,12 @@
 //};
 
 // *needs to be changed if struct Node changes (data received and processed)
-struct Node* CreateNode(int key, char *firstName, char *lastName, char *puid, int age){
+struct Node* CreateNode(char *firstName, char *lastName, char *puid, int age){
 	struct Node *newNode = (struct Node*)malloc(sizeof(struct Node));
 	if (newNode == NULL) {
 		printf("CreateNode(char *firstName, char *lastName, char *puid, int age); -- Failed memory allocation.\n");
 		exit(1);
 	}
-
-	newNode->key = key;
 
 	strcpy(newNode->firstName, firstName);
 	strcpy(newNode->lastName, lastName);
@@ -57,60 +55,6 @@ struct Node* LookUpByIndex(struct Node** start, int index){
 	}
 	printf("LookUpByIndex(struct Node** start, int index); -- No node with matching index exists in list.\n");
 	return NULL; //reached end of LL, no node with matching data
-}
-
-struct Node* LookUpByKey(struct Node** start, int key) {
-	if(key < 1){
-		printf("LookUpByKey(struct Node** start, int key); -- Given key is invalid (less than 1).\n");
-		return NULL;
-	}
-	struct Node* current = *start;
-	while (current != NULL && current->key != key) {
-		current = current->next;
-	}
-	if (current != NULL){
-		return current; 
-	}
-	printf("LookUpByKey(struct Node** start, int key); -- No node with matching key exists in list.\n");
-	return NULL; //reached end of LL, no node with matching data
-}
-
-int GetKeyByIndex(struct Node** start, int index){
-	if (index < 0){
-		printf("GetKeyByIndex(struct Node** start, int index); -- Given index is invalid (less than 0).\n");
-		return -1;
-	}
-
-	struct Node* current = *start;
-	int count = 0;
-	while (current != NULL && count < index) {
-		current = current->next;
-		count++;
-	}
-	if(current != NULL) {
-		return current->key;
-	}
-	printf("GetKeyByIndex(struct Node** start, int index); -- No node with matching index exists in list.\n");
-	return -1;
-}
-
-int GetIndexByKey(struct Node** start, int key) {
-	if(key < 1){
-		printf("GetIndexByKey(struct Node** start, int key); -- Given key is invalid (less than 1).\n");
-		return -1;
-	}
-
-	struct Node* current = *start;
-	int count = 0;
-	while (current != NULL && current->key != key) {
-		current = current->next;
-		count++;
-	}
-	if (current != NULL){
-		return count; 
-	}
-	printf("GetIndexByKey(struct Node** start, int key); -- No node with matching key exists in list.\n");
-	return -1; //reached end of LL, no node with matching data
 }
 
 int GetListLength(struct Node** start){
@@ -188,7 +132,7 @@ int ToCsv(struct Node* node, char *string) {
 		return 0;
 	}
 
-	snprintf(string, 256, "%d, %s, %s, %s, %d\n", node->key, node->firstName, node->lastName, node->puid, node->age);
+	snprintf(string, 256, "%s, %s, %s, %d\n", node->firstName, node->lastName, node->puid, node->age);
 	return 1;
 }
 
@@ -204,7 +148,7 @@ int ToString(struct Node* node, char *string) {
 		printf("ToString(char *string, struct Node* node); -- Node is null, nothing to convert.\n");
 		return 0;
 	}
-	snprintf(string, 256, "Key: %d | Data: %s, %s, %s, %d\n", node->key, node->firstName, node->lastName, node->puid, node->age);
+	snprintf(string, 256, "Data: %s, %s, %s, %d\n", node->firstName, node->lastName, node->puid, node->age);
 	return 1;
 }
 
@@ -225,7 +169,7 @@ void PrintList(struct Node** start){
 	}
 	struct Node* current = *start;
 	while (current != NULL) {
-		printf("Index: %d | ", GetIndexByKey(start, current->key));
+		printf("Index: %d | ");
 		PrintNode(current);
 		current = current->next;
 	}
