@@ -10,6 +10,7 @@
 #include <stdbool.h>
 #include "linkedlist.h"
 
+
 struct Stack
 {
 	Node* head;
@@ -18,8 +19,7 @@ struct Stack
 //ref https://www.geeksforgeeks.org/introduction-to-stack-data-structure-and-algorithm-tutorials/#
 struct StackA {
 	int top;
-	unsigned capacity;
-	Node** array;
+	Node array[256];
 } StackA;
 
 struct Queue {
@@ -61,39 +61,38 @@ struct Node* PopLL(struct Stack* stack)
 	return temp;
 }
 
-struct StackA* CreateStackA(unsigned capacity) 
-{ 
-    struct StackA* stack = (struct StackA*)malloc(sizeof(struct StackA)); 
-    stack->capacity = capacity; 
-    stack->top = -1; 
-    stack->array = (Node**)malloc(stack->capacity * sizeof(struct Node)); 
-    return stack; 
-} 
+// struct StackA CreateStackA() 
+// { 
+//     //struct StackA* stack = (struct StackA*)malloc(sizeof(struct StackA)); 
+//     stack->top = -1;
+//     return stack; 
+//} 
 
-int StackAIsFull(struct StackA* stack){
-	return stack->top == stack->capacity - 1; 
+int StackAIsFull(struct StackA stack){
+	return stack.top == 256 - 1;
 }
 
-int StackAIsEmpty(struct StackA* stack) 
+int StackAIsEmpty(struct StackA stack) 
 { 
-    return stack->top == -1; 
+    return stack.top == -1; 
 } 
 
-void PushA(struct StackA* stack, struct Node* nodeToInsert)
+void PushA(struct StackA stack, struct Node* nodeToInsert)
 {
 	if (StackAIsFull(stack)) 
 		printf("PushA(struct StackA* stack, struct Node* nodeToInsert); - Stack (array) is full, unable to push");
-    	return; 
-    stack->array[++stack->top] = nodeToInsert; 
+    return; 
+    stack.array[++stack.top] = *nodeToInsert; 
 	PrintNode(nodeToInsert);
     printf(" pushed to stack\n");
 }
 
-struct Node* PopA(struct StackA* stack)
+struct Node* PopA(struct StackA stack)
 {
-	if (StackAIsEmpty(stack)) 
-        return NULL; 
-    return stack->array[stack->top--]; 
+	if (!StackAIsEmpty(stack)) {
+    return &(stack.array[stack.top--]); 
+	}
+	return &stack.array[0];
 }
 
 //queue methods
@@ -159,13 +158,13 @@ int EmptyA()
 	return 0;
 }
 
-void PrintArray(Node** arr) {
+void PrintArray(Node arr[]) {
     // Calculate the size of the array
-    int size = sizeof(arr) / sizeof(arr[0]);
+    int size = sizeof(*arr) / sizeof(arr[0]);
 
     // Print the elements of the array
     for (int i = 0; i < size; i++) {
-        PrintNode(arr[i]);
+        PrintNode(&arr[i]);
     }
     printf("\n");
 }
@@ -201,7 +200,8 @@ struct Node *CreateNodeFromUserInput(int *studentKeyCounter) // will use the cou
 void DisplayMenu()
 {
 	struct Stack *_stack = CreateStack();
-	struct StackA *_stackA = CreateStackA(20);
+	//struct StackA *_stackA = CreateStackA(20);
+	struct StackA _stackA;
 	struct Queue *_queue = CreateQueue();
 	int studentKeyCounter = 1; // this key is used to identify every created node as unique. auto increments
 
@@ -354,8 +354,8 @@ void DisplayMenu()
 			PrintList(&(_stack->head));
 			printf("------------------------------------------------------------------------\n");
 
-			printf("Your current stack (array): ----------------------------------------------------\n");
-			PrintArray(_stackA->array);
+			printf("Your current stack (array): --------------------------------------------\n");
+			PrintArray((_stackA.array));
 			printf("------------------------------------------------------------------------\n");
 			break;
 
